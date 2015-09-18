@@ -12,6 +12,69 @@
 # Atom Flight Manual:
 # https://atom.io/docs/latest/using-atom-basic-customization#cson
 '.source.ruby':
+  'Flintbit Template':
+    'prefix': 'flintbit'
+    'body': """
+        # get input from REST JSON or XML
+        ${1:variable name} = @input.get("${2:name or json path}")
+        ${3:variable name} = @input.get("${4:name or json path}")
+
+        #Call a connector syncronously and set arguments
+        response = @call.connector("${5:connector name}").set("key","value").sync
+
+        # check response from connector. '0' means success
+        if response.exitcode != 0
+          # log the success
+          @log.info("Connector Call failed")
+          # exit the flintbit
+          @output.exit(1,"connector call failed")
+        end
+
+        #Call another flintbit syncronously and set arguments
+        bit_response = @call.bit("${6:example:hello.rb}").set("key","value").sync
+        if bit_response.exitcode != 0
+          # log the success
+          @log.info("Flintbit Call failed")
+          # exit the flintbit
+          @output.exit(1,"flintbit call failed")
+        end
+        # check response from connector. '0' means success
+
+
+        # get connector output
+        out = response.get("output")
+
+        # set connector output in REST response
+        @output.set("${7:name}",out)
+    """
   'Get Input':
     'prefix': 'input'
-    'body': '@input.get("${1:name or json path}")'
+    'body': '${1:variable} = @input.get("${1:name or json path}")'
+
+  'Set Output':
+    'prefix': 'output'
+    'body': '@input.set("${1:name}",${1:value or variable})'
+
+  'ssh connector':
+    'prefix': 'connssh'
+    'body': """
+        # Call ssh connector syncronously and set arguments
+        ${1:connector name}_response = @call.connector("${1:connector name}")
+          .set("target","${2:target hostname or ip address}")
+          .set("username","${3:target username}")
+          .set("password","${4:target password}")
+          .set("command","${5:command to run on target}")   #
+          .sync
+
+        # Check connector response. '0' means success
+        if ${1:connector name}_response.exitcode != 0
+          # log the success
+          @log.info("ssh Call failed")
+          # exit the flintbit
+          @output.exit(1,"flintbit call failed")
+        end
+
+        # get command output
+        ${1:connector name}_output = ${1:connector name}_response.get("output")
+
+    """
