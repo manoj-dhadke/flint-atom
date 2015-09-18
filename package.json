@@ -5,7 +5,7 @@
   },
   "main": "./lib/main",
   "version": "0.1.0",
-  "description": "Flint package and Snippets for Atom",
+  "description": "Atom editor package and Snippets for Flint IT Automation Platform",
   "repository": {
     "type": "git",
     "url": "https://github.com/getflint/flint-atom"
