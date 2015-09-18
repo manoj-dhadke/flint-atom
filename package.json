@@ -1,0 +1,29 @@
+{
+  "name": "flint-atom",
+  "author": {
+    "name": "adpande"
+  },
+  "main": "./lib/main",
+  "version": "0.1.0",
+  "description": "Flint package and Snippets for Atom",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getflint/flint-atom"
+  },
+  "license": "Apache 2",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {},
+  "keywords": [
+    "flint",
+    "automation",
+    "orchestration",
+    "workflow",
+    "snippet"
+  ],
+  "bugs": {
+    "url": "https://github.com/getflint/flint-atom/issues"
+  },
+  "homepage": "https://github.com/getflint/flint-atom"
+}
