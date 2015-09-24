@@ -1,0 +1,40 @@
+'.source.ruby':
+  'flint-db-connector-template':
+    'prefix': 'conndb'
+    'body': """
+
+@log.trace("Calling DB Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                    .set("action","${2:select}") #Operations like select, insert, update, delete and procedure
+                                    .set("database","${3:employee}") #Database name on which actions have to be performed                                   
+                                    .set("type","${4:mysql}") #Type of Database like mysql, postgresql, ms sql and oracle        
+                                    .set("target","${5:localhost}") #Host name or IP address of the server on which the database resides
+                                    .set("port",${6:3306}) #Port number on which the target server is listening
+                                    .set("jdbc-url","${7:jdbc:mysql://localhost:3306/employee}") #Url convention followed-jdbc:type://target:port/database
+                                    .set("driver","${8:com.mysql.jdbc.Driver}") #Driver name depending on the type of database specified
+                                    .set("query","${9:select * from employee}") #Specify the query that you want to perform on the database 
+                                    .set("username","${10:root}") #Username associated with the databas
+                                    .set("password","${11:root123}") #Password associated with the database
+                                    .sync
+                                    #.timeout(10000) # Execution time of the Flintbit in milliseconds
+
+#DB Connector Response Meta Parameters
+${12:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
+${13:response_message} = ${1:connector_name}_response.message #Execution status message
+
+#DB Connector Response Parameters
+${14:response_result} = ${1:connector_name}_response.get("result") #Query execution results
+
+
+if ${12:response_exitcode} == 0
+    @log.info('Success in executing SSH Connector, where exitcode ::'+ ${12:response_exitcode} 
+                                                    + '| message ::'+ ${13:response_message})
+    @log.info('Query execution results ::' + ${14:response_result})
+    @output.set("result",${14:response_result}.to_s)
+else
+    @log.error('Failure in executing SSH Connector, where exitcode ::'+ ${12:response_exitcode} 
+                                                     + '| message ::'+ ${13:response_message})
+    @output.set("error",${13:response_message})
+end
+ 
+"""

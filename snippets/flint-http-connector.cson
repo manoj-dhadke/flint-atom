@@ -1,0 +1,37 @@
+'.source.ruby':
+  'flint-http-connector-template':
+    'prefix': 'connhttp'
+    'body': """
+
+@log.trace("Calling HTTP Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("method","${2:post}") #HTTP request method
+                               .set("url","${3:http://httpbin.org/post}") #URL to be queried             
+                               .set("body","${4:Welcome to Flint !!}") #HTTP request body to be sent to the server                               
+                               .set("headers",${5:["Cache-Control:no-cache"]}) #HTTP request headers
+                               .set("timeout",${6:10000}) #Timeout in milliseconds,required by the Connetor to serve the request
+                               .sync
+                               #.timeout(10000) #Execution time of the Flintbit in milliseconds
+
+#HTTP Connector Response Meta Parameters
+${7:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
+${8:response_message} = ${1:connector_name}_response.message #Execution status message
+
+#HTTP Connector Response Parameters
+${9:response_body} = response.get("body") #Response Body
+${10:response_headers} = response.get("headers") #Response Headers
+
+if ${7:response_exitcode} == 0
+    @log.info('Success in executing HTTP Connector where, exitcode ::' + ${7:response_exitcode} 
+                                                     +' | message :: ' + ${8:response_message})
+    @log.info('HTTP Response Headers ::' + ${10:response_headers} +' | 
+               HTTP Response Body ::' + ${9:response_body})
+    @output.set("result",${9:response_body})
+else
+    @log.error('Failure in executing HTTP Connector where, exitcode ::' + ${7:response_exitcode}
+                                                      +' | message :: ' + ${8:response_message})
+    @output.set("error",${8:response_message})
+end
+
+
+"""
