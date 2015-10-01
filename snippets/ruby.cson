@@ -16,36 +16,38 @@
     'prefix': 'flintbit'
     'body': """
         # get input from REST JSON or XML
-        ${1:variable name} = @input.get("${2:name or json path}")
-        ${3:variable name} = @input.get("${4:name or json path}")
+        ${1:variable_name1} = @input.get("${2:name or json path}")
+        ${3:variable_name2} = @input.get("${4:name or json path}")
 
         #Call a connector syncronously and set arguments
         response = @call.connector("${5:connector name}").set("key","value").sync
 
         # check response from connector. '0' means success
-        if response.exitcode != 0
-          # log the success
-          @log.info("Connector Call failed")
+        if response.exitcode == 0
+          # get connector output
+          out = response.get("output")
+
+          # set connector output in REST response
+          @output.set("${6:connector_output}",out)
+        else
+          # log the error
+          @log.error("Connector call failed")
           # exit the flintbit
-          @output.exit(1,"connector call failed")
+          @output.exit(1,"Connector call failed")
         end
 
         #Call another flintbit syncronously and set arguments
-        bit_response = @call.bit("${6:example:hello.rb}").set("key","value").sync
-        if bit_response.exitcode != 0
-          # log the success
-          @log.info("Flintbit Call failed")
+        bit_response = @call.bit("${7:example:hello.rb}").set("key","value").sync
+        if bit_response.exitcode == 0
+          ${8:name} = bit_response.get("name")
+          # set flintbit output in REST response
+          @output.set("${8:name}",${8:name})
+        else
+          # log the error
+          @log.error("Flintbit call failed")
           # exit the flintbit
-          @output.exit(1,"flintbit call failed")
+          @output.exit(1,"Flintbit call failed")
         end
-        # check response from connector. '0' means success
-
-
-        # get connector output
-        out = response.get("output")
-
-        # set connector output in REST response
-        @output.set("${7:name}",out)
     """
   'Get Input':
     'prefix': 'input'
@@ -55,36 +57,13 @@
     'prefix': 'output'
     'body': '@output.set("${1:name}",${1:value or variable})'
 
-  'ssh connector':
-    'prefix': 'connssh'
-    'body': """
-        # Call ssh connector syncronously and set arguments
-        ${1:connector name}_response = @call.connector("${1:connector name}")
-          .set("target","${2:target hostname or ip address}")
-          .set("username","${3:target username}")
-          .set("password","${4:target password}")
-          .set("command","${5:command to run on target}")   #
-          .sync
-
-        # Check connector response. '0' means success
-        if ${1:connector name}_response.exitcode != 0
-          # log the success
-          @log.info("ssh Call failed")
-          # exit the flintbit
-          @output.exit(1,"flintbit call failed")
-        end
-
-        # get command output
-        ${1:connector name}_output = ${1:connector name}_response.get("output")
-
-    """
-'info':
+  'info':
     'prefix':'loginfo'
     'body':'@log.info("${1:Information Statement}")'
 
   'error':
     'prefix':'logerror'
-    'body':'@log.error("${1:Error Statment}")'  
+    'body':'@log.error("${1:Error Statment}")'
 
   'warn':
     'prefix':'logwarn'
@@ -93,3 +72,49 @@
   'debug':
     'prefix':'logdebug'
     'body':'@log.debug("${1:Debug Statement}")'
+
+  'Call flintbit':
+    'prefix' : 'call-flintbit'
+    'body' : """
+      # Call flintbit synchronously and set arguments
+      ${1:flintbit}_response = @call.bit("${2:example:hello.rb}")         # Provide path for flintbit
+                            .set("${3:message}","${4:Welcome to Flint!}") # Set arguments
+                            .sync                               # To call flintbit asynchronously use .async instead of .sync
+    """
+  'Get input using path':
+    'prefix' : 'input-path'
+    'body' : """
+      ${1:name} = @input.path("$.${1:name}") # It will return you values of parameters/elements depending on the JSON/XML
+    """
+
+  'Get raw input':
+    'prefix' : 'input-raw'
+    'body' : """
+        ${1:raw}_input = @input.raw() # It returns a string representation of your JSON/XML input.
+      """
+
+  'Set raw output':
+    'prefix' : 'output-raw'
+    'body' : """
+      @output.setraw("${1:my-details}",'${2:{"name":"tom"}}') # Set JSON object in output
+    """
+
+  'Get global config':
+    'prefix' : 'config-global'
+    'body' : '${1:aws}_username = @config.global("${2:aws.username}") # It gives value for username field from aws config'
+
+  'Get local config':
+    'prefix' : 'config-local'
+    'body' : '${1:aws}_username = @config.local("${2:aws.username}") # It gives value for username field from aws config'
+
+  'Parse json string':
+    'prefix' : 'parse-json'
+    'body' : """
+      name = @util.json('${1:{"name":"tom"}}').get("${2:name}") # The value of JSON parameter name i.e tom will be retrieved.
+    """
+
+  'Parse xml string':
+    'prefix' : 'parse-xml'
+    'body' : """
+      name = @util.xml("${1:<info><name>tom</name></info>}").path("${2:/info/name/text()}") # The value of XML parameter name i.e tom will be retrieved.
+    """
