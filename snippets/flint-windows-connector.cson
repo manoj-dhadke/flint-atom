@@ -1,0 +1,47 @@
+
+'.source.ruby':
+  'flint-windows-connector-template':
+    'prefix': 'connwindows'
+    'body': """
+
+@log.trace("Calling Windows Connector...")
+
+
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                              .set("hostname","${2:192.168.0.106}")#provide windows Server/System hostname.
+                              .set("protocol","${3:http}") #must be specified as http or https depending on unsecure/secure communication 
+                              .set("command",${4:command})#command to be executed on windows machine
+                              .set("user","${5:ABC}")# username associated with windows machine 
+                              .set("password","${6:XXXX}")#provide valid password
+                              .set("port",${7:5985})#port number on which the  windows System/Server is listening(default:http:5985/https:5986)
+                              .set("timeout",${8:200})#timeout in milliseconds
+                              .sync
+
+
+#Windows Connector Response Meta Parameters
+${9:response_exitcode}=${1:connector_name}_response.exitcode    #Exit status code
+${10:response_message} = ${1:connector_name}_response.message   #Execution status messages
+
+
+#Windows Connector Response Parameters
+${11:response_output} = response.get("output")  #command execution results
+${12:response_exit_status} = response.get("exit-status") #command execution exit status
+${13:response_error} = response.get("error") #error cause
+
+
+if ${9:response_exitcode} == 0
+
+    @log.info('SUCCESS in executing Windows Connector where, exitcode ::' +${9:response_exitcode} '|
+                                                              message ::' +${10:response_message})
+    
+    @log.info('Command execution results :: output:: ' +${11:response_output} '|
+                                            exit-status:: ' +${12:response_exit_status} '|
+                                            error::' + ${13:+response_error})
+
+else
+    @log.error('ERROR in executing Windows connector where, exitcode ::' +${9:response_exitcode} '|
+                                                              message :: ' +${6:response_message})
+    @output.exit(1,${10:response_message})
+end      
+
+"""

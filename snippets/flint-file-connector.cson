@@ -1,0 +1,59 @@
+# An example CoffeeScript snippet to expand log to console.log:
+#
+# '.source.coffee':
+#   'Console log':
+#     'prefix': 'log'
+#     'body': 'console.log $1'
+#
+# Each scope (e.g. '.source.coffee' above) can only be declared once.
+#
+# This file uses CoffeeScript Object Notation (CSON).
+# If you are unfamiliar with CSON, you can read more about it in the
+# Atom Flight Manual:
+
+'.source.ruby':
+  'flint-file-connector-template':
+    'prefix': 'connfile'
+    'body': """
+
+@log.trace("Calling File Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","${2:Actions - read, write, delete & append}") #Actions to be performed on files
+                               .set("file","${3:Absolute path of the file}") #Absolute path of the file, including the file name on which operation has to be performed. Valid file types : html, text, json, xml           
+                               .set("data","${4:Data that has to be either appended or written to the file}") #Data that has to be either appended or written to the file                              
+                               .sync
+
+
+#File Connector Response Meta Parameters
+${5:response_exitcode}=${1:connector_name}_response.exitcode    #Exit status code
+${6:response_message} = ${1:connector_name}_response.message    #Execution status messages
+
+
+#File Connector Response Parameters
+${7:response_file} = response.get("file")  #File read
+${8:response_body} = response.get("body") #Response Body, data read from the file
+
+if ${5:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing File Connector where, exitcode ::' +${5:response_exitcode} |
+                                                          'message ::' +${6:response_message})
+
+   @log.info('File read :: '+${7:response_file} | 'Data read from the File ::' +${8:response_body})
+   
+   @output.set("content",${8:response_body})
+   
+   @output.set("file-path",${7:response_file})
+  
+else
+   
+   @log.error('ERROR in executing File connector where, exitcode :: ' +${5:response_exitcode} |
+                                                         'message :: '+${6:response_message})
+   @output.exit(1,${6:response_message})      
+
+end
+   
+"""
+
+
+
+

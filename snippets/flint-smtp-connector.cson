@@ -1,0 +1,45 @@
+'.source.ruby':
+  'flint-smtp-connector-template':
+    'prefix': 'connsmtp'
+    'body': """
+
+@log.trace("Calling SMTP Connector...")
+
+
+${1:connector_name}_response= @call.connector("${1:connector_name}")
+                              .set("cc",${2:@cc})#Usernames of email accounts who need to be kept informed of the email message content, but no actions required from them.
+                              .set("bcc",${3:@bcc})#Usernames of email accounts you don't wish the other recipients to see that you sent it to this contact.
+                              .set("subject",${4:@subject})#Specify subject of an email message here
+                              .set("from",${5:@from})#Usernames of email accounts for whom the email message is meant
+                              .set("to",${6:@to})#Username is the full email address of the sender's email account#Email message content mainly a text
+                              .set("body",${7:@body})#Email message content mainly a text
+                              .set("action","send")#Specify action as “send” for sending an email message
+                              .set("attachments",${8:@attachments})#Files to be attached to an email message
+                              .sync
+
+#SMTP Connector Response Meta Parameters
+${9:response_exitcode}=${9:response_exitcode}   #Exit status code
+${10:response_message}=${10:response_message}   #Execution status message
+
+
+#SMTP Connector Response Parameters
+${11:result} = response.get("result")   #Response Body
+
+if  ${9:response_exitcode} == 0
+    
+    @log.info('Success in executing SMTP Connector where, exitcode ::' +${9:response_exitcode} '| 
+    	                                                  message :: ' +${10:response_message})
+
+    @log.info('SMTP Response Body :: '+${10:response_message})
+	
+    @output.set("result",${10:response_message})
+else
+    
+    @log.error('Failure in executing SMTP Connector where, exitcode :: ' +${9:response_exitcode} '| 
+		                                                       message :: ' +${10:response_message})
+    @log.error("Failed")
+	
+    @output.set("result",response.message)
+end
+
+"""
