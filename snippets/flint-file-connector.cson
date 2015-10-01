@@ -13,7 +13,7 @@
 
 '.source.ruby':
   'flint-file-connector-template':
-    'prefix': 'connfile'
+    'prefix': 'call-file-connector'
     'body': """
 
 @log.trace("Calling File Connector...")
