@@ -1,57 +1,407 @@
 '.source.ruby':
   'Create AWS instance':
-    'prefix': 'connaws-create-instance'
+    'prefix': 'call-ec2-create-instance'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","create-instance") #Contains the name of the operation 
-                               .set("image-id","${2:ami-1a2b3c}") #Unique ID for the Amazon Machine Images,Mandatory               
-                               .set("instance-type","${3:m1.small}") #Type of the instance,Mandatory                               
-                               .set("min-instance",${4:1})  #Minimum number of instances to launch,Mandatory
-                               .set("max-instance",${5:1})  #Maximum number of instances to launch,Mandatory
-                               .set("region","${6:ap-southeast-1}")  #Amazon EC2 region,default region is "us-east-1"
-                               .set("availability-zone","${7:ap-southeast-1a}")  #Amazon EC2 availability zone,default "us-east-1a"
-                               .set("key-name","${8:flint-test}")  #Key-pair name
-                               .set("subnet-id","${9:subnet-4d3c2b1a}")  #Subnet ID for VPC instances
-                               .set("security-key","${10:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${11:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","create-instance")                          #Contains the name of the operation (Mandatory)
+                               .set("image-id","${2:Amazon Machine Image ID}")                #Unique ID for the Amazon Machine Images (Mandatory)
+                               .set("instance-type","${3:Instance Type}")                     #Type of the instance (Mandatory)
+                               .set("min-instance",${4:1})                                    #Minimum number of instances to launch (Mandatory)
+                               .set("max-instance",${5:1})                                    #Maximum number of instances to launch (Mandatory)
+                               .set("region","${6:Amazon EC2 region}")                        #Amazon EC2 region,default region is "us-east-1" (Optional)
+                               .set("availability-zone","${7:Amazon EC2 availability zone}")  #Amazon EC2 availability zone,default "us-east-1a" (Optional)
+                               .set("key-name","${8:Key pair name}")                          #Key-pair name (Optional)
+                               .set("subnet-id","${9:Subnet ID}")                             #Subnet ID for VPC instances (Optional)
+                               .set("security-key","${10:Your security key}")                  #Your Amazon EC2 account security key (Optional)
+                               .set("access-key","${11:Your secret access key}")               #Your Amazon EC2 account secret access key (Optional)
+                               .timeout(10000)                                           #Execution time of the Flintbit in milliseconds (Optional)
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
-${12:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
-${13:response_message} = ${1:connector_name}_response.message #Execution status message
+${12:response_exitcode} = ${1:connector_name}_response.exitcode   #Exit status code
+${13:response_message} = ${1:connector_name}_response.message     #Execution status message
 
 #AWS-EC2 Connector Response Parameters
-${14:instance_info} = response.get("instance-info") #Amazon EC2 created instance info set
+${14:instance_info} = ${1:connector_name}_response.get("instance-info")               #Amazon EC2 created instance info set
 
 if ${12:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${12:response_exitcode} 
-                                                        +' | message :: ' + ${13:response_message})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${12:response_exitcode.to_s}+' | message :: ' + ${13:response_message})
     ${14:instance_info}.each do |${15:instance}|
-    @log.info('Amazon EC2 Instance ID :' + ${15:instance}.get("instance-id") + ' |  
-                          Instance Type :' + ${15:instance}.get("instance-type") +' | 
-                          Instance public IP : ' + ${15:instance}.get("public-ip") +' | 
-                          Instance private IP : ' + ${15:instance}.get("private-ip")} )
+      @log.info('Amazon EC2 Instance ID :'+${15:instance}.get("instance-id")+' | Instance public IP : ' +${15:instance}.get("public-ip"))
+    end
     @output.set("result",${14:instance_info})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${12:response_exitcode}
-                                                         +' | message :: ' + ${13:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${12:response_exitcode.to_s}+' | message :: ' + ${13:response_message})
     @output.set("error",${13:response_message})
 end
 
    """
-  
+
+  'Start AWS instance':
+    'prefix': 'call-ec2-start-instance'
+    'body': """
+
+@log.trace("Calling AWS-EC2 Connector...")
+
+
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","start-instances")              #Contains the name of the operation (Mandatory)
+                               .set("instance_id","${2:Instance ID}")             #Contains one or more instance IDs corresponding to the instances that you want to start (Mandatory)
+                               .set("region","${3:Amazon EC2 region}")            #Amazon EC2 region,default region is "us-east-1" (Optional)
+                               .set("security-key","${4:Your security key}")      #Your Amazon EC2 account security key
+                               .set("access-key","${5:Your secret access key}")   #Your Amazon EC2 account secret access key
+                               .timeout(10000)                               #Execution time of the Flintbit in milliseconds
+                               .sync
+
+
+#AWS-EC2 Connector Response Meta Parameters
+${6:response_exitcode} = ${1:connector_name}_response.exitcode  #Exit status code
+${7:response_message} = ${1:connector_name}_response.message    #Execution status message
+
+#Amazon EC2 Connector Response Parameters
+${8:instances_set}=${1:connector_name}_response.get("started-instances-set")        #Set of Amazon EC2 started instances
+
+if ${9:response_exitcode} == 0
+   @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode.to_s}+' | message :: ' + ${7:response_message})
+
+   ${10:instances_set}.each do |${11:instance_id}|
+   @log.info("Amazon EC2 Instance current state :'+${11:instance_id}.get('current-state')+' |Instance id :'+${11:instance_id}.get('instance-id')")
+   end
+
+else
+   @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${12:response_exitcode.to_s}+' | message :: ' + ${13:response_message})
+   @output.set("error",${7:response_message})
+
+end
+
+"""
+
+  'Stop AWS instance':
+    'prefix': 'call-ec2-stop-instance'
+    'body': """
+
+    @log.trace("Calling AWS-EC2 Connector...")
+
+
+    ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","stop-instances")             #Contains the name of the operation (Mandatory)
+                                   .set("instance_id","${2:Instance ID}")           #Contains one or more instance IDs corresponding to the instances that you want to start (Mandatory)
+                                   .set("region","${3:Amazon EC2 region}")          #Amazon EC2 region,default region is "us-east-1" (Optional)
+                                   .set("security-key","${4:Your security key}")    #Your Amazon EC2 account security key (Optional)
+                                   .set("access-key","${5:Your secret access key}") #Your Amazon EC2 account secret access key (Optional)
+                                   .timeout(10000)                             #Execution time of the Flintbit in milliseconds (Optional)
+                                   .sync
+
+
+#AWS-EC2 Connector Response Meta Parameters
+${6:response_exitcode} = ${1:connector_name}_response.exitcode  #Exit status code
+${7:response_message} = ${1:connector_name}_response.message    #Execution status message
+
+#Amazon EC2 Connector Response Parameters
+${8:instances_set}=${1:connector_name}_response.get("stop-instance-list")    #Set of Amazon EC2 stopped instances
+
+
+
+if ${6:response_exitcode} == 0
+   @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+
+   ${8:instances_set}.each do |${9:instance_id}|
+   @log.info("Amazon EC2 Instance current state :'+${9:instance_id}.get('current-state')+' | Instance id :'+${9:instance_id}.get('instance-id')")
+   end
+
+else
+
+   @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+   @output.set("error",${7:response_message})
+
+end
+"""
+
+  'Terminate AWS instance':
+    'prefix': 'call-ec2-terminate-instance'
+    'body': """
+
+    @log.trace("Calling AWS-EC2 Connector...")
+
+    ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","terminate-instances")       #Contains the name of the operation
+                                   .set("instance_id","${2:Instance ID}")          #Contains one or more instance IDs corresponding to the instances that you want to start
+                                   .set("region","${3:ap-southeast-1}")            #Amazon EC2 region,default region is "us-east-1"
+                                   .set("security-key","${4:Your security key}")   #Your Amazon EC2 account security key
+                                   .set("access-key","${5:Your access key}")       #Your Amazon EC2 account secret access key
+                                   .timeout(10000)                            #Execution time of the Flintbit in milliseconds
+                                   .sync
+
+
+#AWS-EC2 Connector Response Meta Parameters
+${6:response_exitcode} = ${1:connector_name}_response.exitcode   #Exit status code
+${7:response_message} = ${1:connector_name}_response.message     #Execution status message
+
+#Amazon EC2 Connector Response Parameters
+${8:instances_set}=${1:connector_name}_response.get("terminated-instance-set")   #Set of Amazon EC2 terminated instances
+
+
+if ${6:response_exitcode} == 0
+   @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+
+   ${8:instances_set}.each do |${9:instance_id}|
+
+   @log.info("Amazon EC2 Instance current state :'+${9:instance_id}.get('current-state')+' | Instance id :'+${9:instance_id}.get('instance-id')")
+
+   end
+
+else
+
+   @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+   @output.set("error",${7:response_message})
+
+end
+
+
+"""
+
+  'Reboot AWS instance':
+    'prefix': 'call-ec2-reboot-instance'
+    'body': """
+
+@log.trace("Calling AWS-EC2 Connector...")
+
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","reboot-instances")           #Contains the name of the operation
+                               .set("instance_id","${2:Instance ID}")           #Contains one or more instance IDs corresponding to the instances that you want to start
+                               .set("region","${3:Amazon EC2 region}")          #Amazon EC2 region,default region is "us-east-1"
+                               .set("security-key","${4:Your security key}")    #Your Amazon EC2 account security key
+                               .set("access-key","${5:Your secret access key}") #Your Amazon EC2 account secret access key
+                               .timeout(10000)                             #Execution time of the Flintbit in milliseconds
+                               .sync
+
+#AWS-EC2 Connector Response Meta Parameters
+${6:response_exitcode} = ${1:connector_name}_response.exitcode  #Exit status code
+${7:response_message} = ${1:connector_name}_response.message    #Execution status message
+
+#Amazon EC2 Connector Response Parameters
+${8:instances_set}=response.get("reboot-instance-id")   #Set of Amazon EC2 rebooted instances
+
+if ${6:response_exitcode} == 0
+   @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+
+    ${8:instances_set}.each do |${9:instance_id}|
+       @log.info('Amazon EC2 rebooted instance : '+${9:instance_id.to_s})
+    end
+else
+   @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+   @output.set("error",${7:response_message})
+
+end
+"""
+
+  'Describe aws instance':
+    'prefix':'call-ec2-describe-instance'
+    'body': """
+
+    @log.trace("Calling AWS-EC2 Connector...")
+
+    ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","describe-instances")         #Contains the name of the operation (Mandatory)
+                                   .set("instance_id","${2:Instance ID}")           #Contains one or more instance IDs corresponding to the instances that you want to start (Mandatory)
+                                   .set("region","${3:ap-southeast-1}")             #Amazon EC2 region,default region is "us-east-1" (Optional)
+                                   .set("security-key","${4:Your security key}")    #Your Amazon EC2 account security key
+                                   .set("access-key","${5:Your secret access key}") #Your Amazon EC2 account secret access key
+                                   .timeout(10000)                             #Execution time of the Flintbit in milliseconds
+                                   .sync
+
+
+#AWS-EC2 Connector Response Meta Parameters
+${6:response_exitcode} = ${1:connector_name}_response.exitcode  #Exit status code
+${7:response_message} = ${1:connector_name}_response.message    #Execution status message
+
+#Amazon EC2 Connector Response Parameters
+${8:instances_info}=${1:connector_name}_response.get("instances-info")   #Set of Amazon EC2 instances
+
+if ${6:response_exitcode} == 0
+   @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+       ${8:instances_info}.each do |${9:instance}|
+          #To get more Information about instance please refer Flint documentation
+          @log.info('Amazon EC2 instance image id : '+${9:instance}.get("image-id")+' | public ip : '+${9:instance}.get("public-ip"))
+       end
+else
+   @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+   @output.set("error",${7:response_message})
+end
+"""
+
+  'List aws instance':
+    'prefix':'call-ec2-list-instance'
+    'body': """
+    @log.trace("Calling AWS-EC2 Connector...")
+
+    ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","list")                     #Contains the name of the operation
+                                   .set("region","${2:ap-southeast-1}")             #Amazon EC2 region,default region is "us-east-1"
+                                   .set("security-key","${3:Your security key}")    #Your Amazon EC2 account security keysecret access key
+                                   .set("access-key","${4:Your secret access key}") #Your Amazon EC2 account secret access key
+                                   .timeout(10000)                           #Execution time of the Flintbit in milliseconds
+                                   .sync
+
+#AWS-EC2 Connector Response Meta Parameters
+${5:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
+${6:response_message} = ${1:connector_name}_response.message #Execution status message
+
+#Amazon EC2 Connector Response Parameters
+${7:instances_list}=${1:connector_name}_response.get("instance-list")
+
+if ${6:response_exitcode} == 0
+   @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+
+   ${7:instances_list}.each do |${8:instance_id}|
+         @log.info('Amazon EC2 instance : '+ ${8:instance_id.to_s})
+   end
+else
+   @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
+   @output.set("error",${7:response_message})
+end
+
+"""
+
+
+  'Create Tags Operation':
+    'prefix':'call-ec2-create-tags'
+    'body':"""
+      @log.trace("Calling AWS-EC2 Connector...")
+       ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","create-tags")                     #Contains the name of the operation
+                                   .set("resource-id","${2:Resource ID}")
+                                   .set("tag-key","${3:AWS tag key}")
+                                   .set("tag-value","${4:Windows AMI}")
+                                   .set("region","${5:ap-southeast-1}")                  #Amazon EC2 region,default region is "us-east-1"(Optional)
+                                   .set("security-key","${6:Your secret security key}")  #Your security key (Optional)
+                                   .set("access-key","${7:Your secret access key}")      #Your secret access key (Optional)
+                                   .timeout(100000)                                 #Execution time of the Flintbit in milliseconds (Optional)
+                                   .sync
+
+      #Amazon EC2 Connector Response Meta Parameters
+       ${8:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
+       ${9:response_message} = ${1:connector_name}_response.message   #Execution status messages
+      if ${8:response_exitcode} == 0
+
+         @log.info('Success in executing AWS-EC2 Connector where, exitcode :: '+ ${8:response_exitcode.to_s}+' | message :: '+ ${9:response_message})
+
+      else
+
+         @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+ ${8:response_exitcode.to_s}+' | message :: ' + ${9:response_message})
+         @output.set("error",${9:response_message})
+
+      end
+
+    """
+
+  'Delete Tags Operations':
+    'prefix':'call-ec2-delete-tags'
+    'body':"""
+      @log.trace("Calling AWS-EC2 Connector...")
+      ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","delete-tags")                      #Contains the name of the operation
+                                   .set("resource-id","${2:Resource ID}")
+                                   .set("tag-key","${3:AWS tag key}")
+                                   .set("tag-value","${4:Windows AMI}")
+                                   .set("region","${5:ap-southeast-1}")                  #Amazon EC2 region,default region is "us-east-1" (Optional)
+                                   .set("security-key","${6:Your secret security key}")  #Your security key (Optional)
+                                   .set("access-key","${7:Your secret access key}")      #Your secret access key (Optional)
+                                   .timeout(10000)                                  #Execution time of the Flintbit in milliseconds (Optional)
+                                   .sync
+
+    #Amazon EC2 Connector Response Meta Parameters
+       ${8:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
+       ${9:response_message} = ${1:connector_name}_response.message   #Execution status messages
+      if ${8:response_exitcode} == 0
+
+         @log.info('Success in executing AWS-EC2 Connector where, exitcode :: '+ ${8:response_exitcode.to_s}+' | message :: '+ ${9:response_message})
+      else
+
+         @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+ ${8:response_exitcode.to_s}+ ' | message :: '+ ${9:response_message})
+         @output.set("error",${9:response_message})
+
+      end
+
+    """
+  'Describe Tags Operation':
+    'prefix':'call-ec2-describe-tags'
+    'body':"""
+       @log.trace("Calling AWS-EC2 Connector...")
+      ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","describe-tags")                      #Contains the name of the operation
+                                   .set("resource-id","${2:Resource ID}")
+                                   .set("resource-type", "${3:Image}")
+                                   .set("region","${4:ap-southeast-1}")                     #Amazon EC2 region,default region is "us-east-1"(Optional)
+                                   .set("security-key","${5:Your secret security key }")  #Your secret security  key(Optional)
+                                   .set("access-key","${6:Your access key}")                #Your access key (Optional)
+                                   .timeout(10000)                                     #Execution time of the Flintbit in milliseconds(Optional)
+                                   .sync
+
+    #Amazon EC2 Connector Response Meta Parameters
+       ${7:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
+       ${8:response_message} = ${1:connector_name}_response.message   #Execution status messages
+      if ${7:response_exitcode} == 0
+
+         @log.info('Success in executing AWS-EC2 Connector where, exitcode :: '+ ${7:response_exitcode.to_s}+' | message :: '+ ${8:response_message})
+
+      else
+
+         @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+  ${7:response_exitcode.to_s}+' | message :: '+${8:response_message})
+         @output.set("error",${8:response_message})
+
+      end
+
+    """
+
+
+  'Describe address operation':
+    'prefix':'connaws-describe-address'
+    'body':"""
+    @log.trace("Calling AWS-EC2 Connector...")
+
+    ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                   .set("action","describe-addresses")#Contains the name of the operation
+                                   .set("public-ip",${2:52.73.64.21}) #Your public ip
+                                   .set("region",${3:ap-southeast-1})#Amazon EC2 region,default region is "us-east-1"
+                                   .set("security-key",${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx})#Your secret access key
+                                   .set("access-key",${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}) #Your security key
+                                   .timeout(request_timeout) #Execution time of the Flintbit in milliseconds
+                                   .sync
+
+    #Amazon EC2 Connector Response Meta Parameters
+    ${6:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
+    ${7:response_message} = ${1:connector_name}_response.message   #Execution status messages
+
+    if ${6:response_exitcode} == 0
+
+         @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode} +' | message :: ' + ${7:response_message})
+         ${8:public_ips_set} = response.get("public-ips-set")  #set of public IP of amazon EC2 account
+         @log.info('Amazon EC2 Public IP set : '+ ${9:instance_ip.to_s})
+
+    else
+
+        @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' +  ${6:response_exitcode} + ' | message :: ' + ${7:response_message})
+        @output.set("error",${7:response_message})
+
+    end
+
+end
+"""
+
+
+
   'Create Security Group':
     'prefix': 'connaws-create-security-group'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","create-security-group") #Contains the name of the operation 
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group is to be created,default is "us-east-1"              
-                               .set("group-name","${3:flint-test}") #Name with which group is to be created                               
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","create-security-group") #Contains the name of the operation
+                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group is to be created,default is "us-east-1"
+                               .set("group-name","${3:flint-test}") #Name with which group is to be created
                                .set("group-description","${4:Test security group}")  #Description of group
                                .set("security-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
                                .set("access-key","${6:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
@@ -66,7 +416,7 @@ ${8:response_message} = ${1:connector_name}_response.message #Execution status m
 ${9:group_id} = response.get("group-id") #Group id of Amazon EC2 Security group
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode} 
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
                                                         +' | message :: ' + ${8:response_message})
     @log.info('Created Amazon EC2 Group with ID :' + ${9:group_id})
     @output.set("result",${9:group_id})
@@ -83,10 +433,10 @@ end
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","create-security-group") #Contains the name of the operation 
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group lies,default is "us-east-1"              
-                               .set("group-name","${3:flint-test}") #Name of group to be described                               
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","create-security-group") #Contains the name of the operation
+                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group lies,default is "us-east-1"
+                               .set("group-name","${3:flint-test}") #Name of group to be described
                                .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
                                .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
                                .timeout(10000) #Execution time of the Flintbit in milliseconds
@@ -100,7 +450,7 @@ ${7:response_message} = ${1:connector_name}_response.message #Execution status m
 ${8:security_group_info} = response.get("security-group-info")  #Set of Amazon EC2 security groups details
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode} 
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
                                                         +' | message :: ' + ${7:response_message})
     ${8:security_group_info}.each do |${9:group_info}|
     @log.info('Amazon EC2 Security group owner ID :' ${9:group_info}.get("owner-id")
@@ -125,10 +475,10 @@ end
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","delete-security-group") #Contains the name of the operation 
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group lies,default is "us-east-1"              
-                               .set("group-name","${3:flint-test}") #Name of group to be deleted                                  
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","delete-security-group") #Contains the name of the operation
+                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group lies,default is "us-east-1"
+                               .set("group-name","${3:flint-test}") #Name of group to be deleted
                                .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
                                .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
                                .timeout(10000) #Execution time of the Flintbit in milliseconds
@@ -142,7 +492,7 @@ ${8:response_message} = ${1:connector_name}_response.message #Execution status m
 ${9:group_id} = response.get("group-id") #Group id of Amazon EC2 Security group
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode} 
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
                                                         +' | message :: ' + ${8:response_message})
     @log.info('Created Amazon EC2 Group with ID :' + ${9:group_id})
     @output.set("result",${9:group_id})
@@ -159,9 +509,9 @@ end
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","allocate-address") #Contains the name of the operation 
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which address is to be allocated,default is "us-east-1"             
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","allocate-address") #Contains the name of the operation
+                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which address is to be allocated,default is "us-east-1"
                                .set("security-key","${3:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
                                .set("access-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
                                .timeout(10000) #Execution time of the Flintbit in milliseconds
@@ -175,7 +525,7 @@ ${6:response_message} = ${1:connector_name}_response.message #Execution status m
 ${7:public_ip} = response.get("public-ip") #Allocated Public IP of Amazon EC2
 
 if ${5:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${5:response_exitcode} 
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${5:response_exitcode}
                                                         +' | message :: ' + ${6:response_message})
     @log.info('Allocated address :' + ${7:public_ip})
     @output.set("result",${7:public_ip})
@@ -192,10 +542,10 @@ end
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","release-address") #Contains the name of the operation 
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","release-address") #Contains the name of the operation
                                .set("public-ip",${2:"192.168.45.45"}) #Address which is to be released
-                               .set("region","${3:ap-southeast-1}") #Amazon EC2 region to which address was allocated,default is "us-east-1"             
+                               .set("region","${3:ap-southeast-1}") #Amazon EC2 region to which address was allocated,default is "us-east-1"
                                .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
                                .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
                                .timeout(10000) #Execution time of the Flintbit in milliseconds
@@ -206,7 +556,7 @@ ${6:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
 ${7:response_message} = ${1:connector_name}_response.message #Execution status message
 
 if ${6:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode} 
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
                                                         +' | message :: ' + ${7:response_message})
     @output.set("result",${7:response_message})
 else
@@ -222,11 +572,11 @@ end
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","associate-address") #Contains the name of the operation 
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","associate-address") #Contains the name of the operation
                                .set("instance-id","${2:i-a1b2c3}") #Instance to which address has to be associated
-                               .set("public-ip",${3:"192.168.45.45"}) #Address which is to be associated with the specified instance                               
-                               .set("region","${4:ap-southeast-1}") #Amazon EC2 region in which instance lies,default is "us-east-1"             
+                               .set("public-ip",${3:"192.168.45.45"}) #Address which is to be associated with the specified instance
+                               .set("region","${4:ap-southeast-1}") #Amazon EC2 region in which instance lies,default is "us-east-1"
                                .set("security-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
                                .set("access-key","${6:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
                                .timeout(10000) #Execution time of the Flintbit in milliseconds
@@ -237,7 +587,7 @@ ${7:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
 ${8:response_message} = ${1:connector_name}_response.message #Execution status message
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode} 
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
                                                         +' | message :: ' + ${8:response_message})
     @output.set("result",${8:response_message})
 else
@@ -253,10 +603,10 @@ end
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}") 
-                               .set("action","disassociate-address") #Contains the name of the operation 
-                               .set("public-ip",${2:"192.168.45.45"}) #Address which is to be disassociated                               
-                               .set("region","${3:ap-southeast-1}") #Amazon EC2 region to which address was associated,default is "us-east-1"             
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                               .set("action","disassociate-address") #Contains the name of the operation
+                               .set("public-ip",${2:"192.168.45.45"}) #Address which is to be disassociated
+                               .set("region","${3:ap-southeast-1}") #Amazon EC2 region to which address was associated,default is "us-east-1"
                                .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
                                .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
                                .timeout(10000) #Execution time of the Flintbit in milliseconds
@@ -267,7 +617,7 @@ ${6:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
 ${7:response_message} = ${1:connector_name}_response.message #Execution status message
 
 if ${6:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode} 
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
                                                         +' | message :: ' + ${7:response_message})
     @output.set("result",${7:response_message})
 else
@@ -277,12 +627,3 @@ else
 end
 
    """
-
-
-
-
-
-
-
-
-
