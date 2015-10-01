@@ -78,7 +78,6 @@
         ${1:connector name}_output = ${1:connector name}_response.get("output")
 
     """
-
 'info':
     'prefix':'loginfo'
     'body':'@log.info("${1:Information Statement}")'
