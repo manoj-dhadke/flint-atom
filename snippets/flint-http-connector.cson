@@ -11,26 +11,22 @@ ${1:connector_name}_response = @call.connector("${1:connector_name}")
                                .set("headers",${5:["Cache-Control:no-cache"]})                         #HTTP request headers
                                .set("timeout",${6:10000})                                              #Timeout in milliseconds,required by the Connetor to serve the request
                                .sync
-                               #.timeout(10000)                                                        #Execution time of the Flintbit in milliseconds
+                               #.timeout(10000)                                                   #Execution time of the Flintbit in milliseconds
 
 #HTTP Connector Response Meta Parameters
-${7:response_exitcode} = ${1:connector_name}_response.exitcode                                         #Exit status code
-${8:response_message} = ${1:connector_name}_response.message                                           #Execution status message
+${7:response_exitcode} = ${1:connector_name}_response.exitcode                                              #Exit status code
+${8:response_message} = ${1:connector_name}_response.message                                                #Execution status message
 
 #HTTP Connector Response Parameters
-${9:response_body} = response.get("body")                                                              #Response Body
-${10:response_headers} = response.get("headers")                                                       #Response Headers
+${9:response_body} = ${1:connector_name}_response.get("body")                                               #Response Body
+${10:response_headers} = ${1:connector_name}_response.get("headers")                                         #Response Headers
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing HTTP Connector where, exitcode ::' + ${7:response_exitcode}
-                                                     +' | message :: ' + ${8:response_message})
-    @log.info('HTTP Response Headers ::' + ${10:response_headers} +' |
-               HTTP Response Body ::' + ${9:response_body})
-    @output.set("result",${9:response_body})
+    @log.info('Success in executing HTTP Connector where, exitcode ::'+response_exitcode.to_s+' | message :: '+response_message)
+    @output.set("result",response_body)
 else
-    @log.error('Failure in executing HTTP Connector where, exitcode ::' + ${7:response_exitcode}
-                                                      +' | message :: ' + ${8:response_message})
-    @output.set("error",${8:response_message})
+    @log.error('Failure in executing HTTP Connector where, exitcode ::'+response_exitcode.to_s+' | message :: ' +response_message)
+    @output.set("error",response_message)
 end
 
 
