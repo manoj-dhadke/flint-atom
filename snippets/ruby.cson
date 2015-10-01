@@ -53,7 +53,7 @@
 
   'Set Output':
     'prefix': 'output'
-    'body': '@input.set("${1:name}",${1:value or variable})'
+    'body': '@output.set("${1:name}",${1:value or variable})'
 
   'ssh connector':
     'prefix': 'connssh'
@@ -78,3 +78,18 @@
         ${1:connector name}_output = ${1:connector name}_response.get("output")
 
     """
+'info':
+    'prefix':'loginfo'
+    'body':'@log.info("${1:Information Statement}")'
+
+  'error':
+    'prefix':'logerror'
+    'body':'@log.error("${1:Error Statment}")'  
+
+  'warn':
+    'prefix':'logwarn'
+    'body':'@log.warn("${1:Warning Statment}")'
+
+  'debug':
+    'prefix':'logdebug'
+    'body':'@log.debug("${1:Debug Statement}")'
