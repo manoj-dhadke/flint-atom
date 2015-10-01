@@ -1,39 +1,25 @@
 '.source.ruby':
   'flint-ssh-connector-template':
-    'prefix': 'connssh'
+    'prefix': 'call-ssh-connector'
     'body': """
 
-@log.trace("Calling SSH Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")
-                                    .set("target","${2:192.168.0.1}") #Target machine hostname or ip address
-                                    .set("port",${3:22}) #Target machine port,default 22                                    
-                                    .set("type","${4:exec}") #Shell execution type:shell or exec,default exec             
-                                    .set("username","${5:smith}") #Target machine username
-                                    .set("password","${6:jones}") #Target machine password
-                                    .set("passphrase","${7:1234}") #Passphrase to be added to ssh key
-                                    .set("key-file","${8:id_rsa}") #ssh key file name located at /flint-installation-directory/gridconfig/keystore/
-                                    .set("command","${9:pwd}") #Command to be executed on target machine
-                                    .set("timeout",${10:10000}) #in milliseconds required by connector to serve request
-                                    .sync
-                                    #.timeout(10000) # Execution time of the Flintbit in milliseconds
+          @log.trace("Calling SSH Connector...")
+          ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                         .set("target","${2:IP/hostname}") #Target machine hostname or ip address
+                                         .set("port",${3:22})              #Target machine port,default 22
+                                         .set("type","${4:exec}")          #Shell execution type:shell or exec,default exec
+                                         .set("username","${5:username}")  #Target machine username
+                                         .set("password","${6:password}")  #Target machine password
+                                         .set("passphrase","${7:1234}")    #Optional passphrase to be added to ssh key
+                                         .set("key-file","${8:id_rsa}")    #Optional ssh key file absolute path
+                                         .set("command","${9:command}")    #Command to be executed on target machine
+                                         .set("timeout",60000)          #Optional timeout in milliseconds
+                                         .sync
 
-#SSH Connector Response Meta Parameters
-${11:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
-${12:response_message} = ${1:connector_name}_response.message #Execution status message
 
-#SSH Connector Response Parameters
-${13:response_body} = ${1:connector_name}_response.get("result") #Response Body
+          if   ${1:connector_name}_response.exitcode == 0
+              @log.info("Success")
+              ${1:connector_name}_output = ${1:connector_name}_response.get("result")
+          end
 
-if ${11:response_exitcode} == 0
-    @log.info('Success in executing SSH Connector, where exitcode ::'+ ${11:response_exitcode} 
-                                                    + '| message ::'+ ${11:response_message})
-    @log.info('Command executed ::'+ ${11:command} 
-          + '| Command execution results ::'+ ${12:response_body})
-    @output.set("result",${12:response_body})
-else
-    @log.error('Failure in executing SSH Connector, where exitcode ::'+ ${11:response_exitcode} 
-                                                     + '| message ::'+ ${11:response_message})
-    @output.set("error",${11:response_message})
-end
-
-"""
+          """
