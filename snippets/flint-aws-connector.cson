@@ -358,17 +358,17 @@ end
 
 
   'Describe address operation':
-    'prefix':'connaws-describe-address'
+    'prefix':'call-ec2-describe-address'
     'body':"""
     @log.trace("Calling AWS-EC2 Connector...")
 
     ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                                   .set("action","describe-addresses")#Contains the name of the operation
-                                   .set("public-ip",${2:52.73.64.21}) #Your public ip
-                                   .set("region",${3:ap-southeast-1})#Amazon EC2 region,default region is "us-east-1"
-                                   .set("security-key",${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx})#Your secret access key
-                                   .set("access-key",${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}) #Your security key
-                                   .timeout(request_timeout) #Execution time of the Flintbit in milliseconds
+                                   .set("action","describe-addresses")				 #Contains the name of the operation
+                                   .set("public-ip","${2:Your public ip}") 		     #Your Amazon EC2 elastic public ip
+                                   .set("region","${3:Amazon EC2 region}")		      #Amazon EC2 region,default region is "us-east-1"
+                                   .set("security-key","${4:Your security key}")		#Your Amazon EC2 account security key
+                                   .set("access-key","${5:Your secret access key}") #Your Amazon EC2 account secret access key
+                                   .timeout(10000)                             #Execution time of the Flintbit in milliseconds
                                    .sync
 
     #Amazon EC2 Connector Response Meta Parameters
@@ -376,70 +376,64 @@ end
     ${7:response_message} = ${1:connector_name}_response.message   #Execution status messages
 
     if ${6:response_exitcode} == 0
-
-         @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode} +' | message :: ' + ${7:response_message})
+		   @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
          ${8:public_ips_set} = response.get("public-ips-set")  #set of public IP of amazon EC2 account
          @log.info('Amazon EC2 Public IP set : '+ ${9:instance_ip.to_s})
-
     else
-
-        @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' +  ${6:response_exitcode} + ' | message :: ' + ${7:response_message})
+        @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: ' +${7:response_message})
         @output.set("error",${7:response_message})
-
     end
 
-end
+
 """
 
 
 
   'Create Security Group':
-    'prefix': 'connaws-create-security-group'
+    'prefix': 'call-ec2-create-security-group'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                               .set("action","create-security-group") #Contains the name of the operation
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group is to be created,default is "us-east-1"
-                               .set("group-name","${3:flint-test}") #Name with which group is to be created
+                               .set("action","create-security-group") 			    #Contains the name of the operation
+                               .set("region","${2:Amazon EC2 region}") 							 #Amazon EC2 region in which group is to be created,default is "us-east-1"
+                               .set("group-name","${3:Your Security Group name}") 	 #Name with which group is to be created
                                .set("group-description","${4:Test security group}")  #Description of group
-                               .set("security-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${6:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+                               .set("security-key","${5:Your security key}")  			 #Your Amazon EC2 security key
+                               .set("access-key","${6:Your secret access key}")  	  #Your secret access key
+                               .timeout(10000) 													       #Execution time of the Flintbit in milliseconds
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
-${7:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
-${8:response_message} = ${1:connector_name}_response.message #Execution status message
+${7:response_exitcode} = ${1:connector_name}_response.exitcode  #Exit status code
+${8:response_message} = ${1:connector_name}_response.message    #Execution status message
 
 #AWS-EC2 Connector Response Parameters
-${9:group_id} = response.get("group-id") #Group id of Amazon EC2 Security group
+${9:group_id} = ${1:connector_name}_response.get("group-id") #Group id of Amazon EC2 Security group
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
-                                                        +' | message :: ' + ${8:response_message})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${7:response_exitcode.to_s}+' | message :: ' +${8:response_message})
     @log.info('Created Amazon EC2 Group with ID :' + ${9:group_id})
     @output.set("result",${9:group_id})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
-                                                         +' | message :: ' + ${8:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${7:response_exitcode.to_s}+' | message :: ' +${8:response_message})
     @output.set("error",${8:response_message})
 end
 
    """
 
    'Describe Security Group':
-    'prefix': 'connaws-describe-security-group'
+    'prefix': 'call-ec2-describe-security-group'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                               .set("action","create-security-group") #Contains the name of the operation
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group lies,default is "us-east-1"
-                               .set("group-name","${3:flint-test}") #Name of group to be described
-                               .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+                               .set("action","create-security-group") 		  #Contains the name of the operation
+                               .set("region","${2:Amazon EC2 region}") 				   #Amazon EC2 region in which group lies,default is "us-east-1"
+                               .set("group-name","${3:Name of Security group}")  #Name of group to be described
+                               .set("security-key","${4:Your security key}")     #Your security key
+                               .set("access-key","${5:Your secret access key}")  #Your secret access key
+                               .timeout(10000)                              #Execution time of the Flintbit in milliseconds
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
@@ -447,108 +441,99 @@ ${6:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
 ${7:response_message} = ${1:connector_name}_response.message #Execution status message
 
 #AWS-EC2 Connector Response Parameters
-${8:security_group_info} = response.get("security-group-info")  #Set of Amazon EC2 security groups details
+${8:security_group_info} = ${1:connector_name}_response.get("security-group-info")  #Set of Amazon EC2 security groups details
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
-                                                        +' | message :: ' + ${7:response_message})
-    ${8:security_group_info}.each do |${9:group_info}|
-    @log.info('Amazon EC2 Security group owner ID :' ${9:group_info}.get("owner-id")
-                             + ' | group name : ' + ${9:group_info}.get("group-name")
-                             + ' | group description :' + ${9:group_info}.get("group-description")
-                             + ' | group vpc ID :' + ${9:group_info}.get("vpc-id")
-                             + ' | group ID :' + ${9:group_info}.get("group-id")
-                             + ' | group IP Permissions Egress :' + ${9:group_info}.get("ip-permissions-egress")
-                             + ' | group Tags :' + ${9:group_info}.get("tags")
-                             + ' | group IP Permissions :' + ${9:group_info}.get("ip-permissions")')
-    @output.set("result",${8:security_group_info})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' +${6:response_exitcode.to_s}+' | message :: ' +${7:response_message})
+    
+		${8:security_group_info}.each do |${9:group_info}|
+			#To get more Information about Group please refer Flint documentation of AWS-EC2 Connector
+    	@log.info('Amazon EC2 Security group name : '+${9:group_info}.get("group-name"))
+			@log.info('group description :' +${9:group_info}.get("group-description")+ ' | group ID :' + ${9:group_info}.get("group-id"))
+		end
+    	@output.set("result",${8:security_group_info})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
-                                                         +' | message :: ' + ${7:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' +${6:response_exitcode.to_s}+' | message :: ' +${7:response_message})
     @output.set("error",${8:response_message})
 end
 
    """
 
    'Delete Security Group':
-    'prefix': 'connaws-delete-security-group'
+    'prefix': 'call-ec2-delete-security-group'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                               .set("action","delete-security-group") #Contains the name of the operation
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which group lies,default is "us-east-1"
-                               .set("group-name","${3:flint-test}") #Name of group to be deleted
-                               .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+                               .set("action","delete-security-group")           #Contains the name of the operation
+                               .set("region","${2:Amazon EC2 region}")               #Amazon EC2 region in which group lies,default is "us-east-1"
+                               .set("group-name","${3:Name of group}")               #Name of security group to be deleted
+                               .set("security-key","${4:Your security key}")         #Your Amazon EC2 account security key
+                               .set("access-key","${5:Your secret access key}")      #Your Amazon EC2 account secret access key
+                               .timeout(10000)                                  #Execution time of the Flintbit in milliseconds
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
-${7:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
-${8:response_message} = ${1:connector_name}_response.message #Execution status message
+${7:response_exitcode} = ${1:connector_name}_response.exitcode  #Exit status code
+${8:response_message} = ${1:connector_name}_response.message    #Execution status message
 
 #AWS-EC2 Connector Response Parameters
-${9:group_id} = response.get("group-id") #Group id of Amazon EC2 Security group
+${9:group_id} = ${1:connector_name}_response.get("group-id")   #Group id of Amazon EC2 Security group
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
-                                                        +' | message :: ' + ${8:response_message})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${7:response_exitcode.to_s}+' | message :: '+${8:response_message})
     @log.info('Created Amazon EC2 Group with ID :' + ${9:group_id})
     @output.set("result",${9:group_id})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
-                                                         +' | message :: ' + ${8:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${7:response_exitcode.to_s}+' | message :: '+${8:response_message})
     @output.set("error",${8:response_message})
 end
 
    """
 
   'Allocate Address':
-    'prefix': 'connaws-allocate-address'
+    'prefix': 'call-ec2-allocate-address'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                               .set("action","allocate-address") #Contains the name of the operation
-                               .set("region","${2:ap-southeast-1}") #Amazon EC2 region in which address is to be allocated,default is "us-east-1"
-                               .set("security-key","${3:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+                               .set("action","allocate-address")            #Contains the name of the operation
+                               .set("region","${2:Amazon EC2 region}")           #Amazon EC2 region in which address is to be allocated,default is "us-east-1"
+                               .set("security-key","${3:Your security key}")     #Your security key
+                               .set("access-key","${4:Your secret access key}")  #Your secret access key
+                               .timeout(10000)                              #Execution time of the Flintbit in milliseconds
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
 ${5:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
-${6:response_message} = ${1:connector_name}_response.message #Execution status message
+${6:response_message} = ${1:connector_name}_response.message   #Execution status message
 
 #AWS-EC2 Connector Response Parameters
-${7:public_ip} = response.get("public-ip") #Allocated Public IP of Amazon EC2
+${7:public_ip} = ${1:connector_name}_response.get("public-ip") #Allocated Public IP of Amazon EC2
 
 if ${5:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${5:response_exitcode}
-                                                        +' | message :: ' + ${6:response_message})
-    @log.info('Allocated address :' + ${7:public_ip})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${5:response_exitcode.to_s}+' | message :: ' +${6:response_message})
+    @log.info('Allocated address :'+${7:public_ip})
     @output.set("result",${7:public_ip})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${5:response_exitcode}
-                                                         +' | message :: ' + ${6:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${5:response_exitcode.to_s}+' | message :: ' +${6:response_message})
     @output.set("error",${6:response_message})
 end
 
-   """
+"""
 
    'Release Address':
-    'prefix': 'connaws-release-address'
+    'prefix': 'call-ec2-release-address'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                               .set("action","release-address") #Contains the name of the operation
-                               .set("public-ip",${2:"192.168.45.45"}) #Address which is to be released
-                               .set("region","${3:ap-southeast-1}") #Amazon EC2 region to which address was allocated,default is "us-east-1"
-                               .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+                               .set("action","release-address")            #Contains the name of the operation
+                               .set("public-ip","${2:Public IP}")               #Address which is to be released
+                               .set("region","${3:Amazon EC2 region}")          #Amazon EC2 region to which address was allocated,default is "us-east-1"
+                               .set("security-key","${4:Your security key}")    #Your Amazon EC2 account security key
+                               .set("access-key","${5:Your secret access key}") #Your Amazon EC2 account secret access key
+                               .timeout(10000)                             #Execution time of the Flintbit in milliseconds
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
@@ -556,30 +541,28 @@ ${6:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
 ${7:response_message} = ${1:connector_name}_response.message #Execution status message
 
 if ${6:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
-                                                        +' | message :: ' + ${7:response_message})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: ' +${7:response_message})
     @output.set("result",${7:response_message})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
-                                                         +' | message :: ' + ${7:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
     @output.set("error",${7:response_message})
 end
 
    """
 
    'Associate Address':
-    'prefix': 'connaws-associate-address'
+    'prefix': 'call-ec2-associate-address'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                               .set("action","associate-address") #Contains the name of the operation
-                               .set("instance-id","${2:i-a1b2c3}") #Instance to which address has to be associated
-                               .set("public-ip",${3:"192.168.45.45"}) #Address which is to be associated with the specified instance
-                               .set("region","${4:ap-southeast-1}") #Amazon EC2 region in which instance lies,default is "us-east-1"
-                               .set("security-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${6:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+                               .set("action","associate-address")           #Contains the name of the operation
+                               .set("instance-id","${2:i-a1b2c3}")               #Instance to which address has to be associated
+                               .set("public-ip","${3:public ip}")                #Address which is to be associated with the specified instance
+                               .set("region","${4:Amazon EC2 region}")           #Amazon EC2 region in which instance lies,default is "us-east-1"
+                               .set("security-key","${5:Your security key}")     #Your Amazon EC2 account security key
+                               .set("access-key","${6:Your secret access key}")  #Your Amazon EC2 account secret access key
+                               .timeout(10000)                              #Execution time of the Flintbit in milliseconds
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
@@ -587,29 +570,27 @@ ${7:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
 ${8:response_message} = ${1:connector_name}_response.message #Execution status message
 
 if ${7:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
-                                                        +' | message :: ' + ${8:response_message})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${7:response_exitcode.to_s}+' | message :: '+${8:response_message})
     @output.set("result",${8:response_message})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${7:response_exitcode}
-                                                         +' | message :: ' + ${8:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${7:response_exitcode.to_s}+' | message :: '+${8:response_message})
     @output.set("error",${8:response_message})
 end
 
    """
 
    'Disassociate Address':
-    'prefix': 'connaws-disassociate-address'
+    'prefix': 'call-ec2-disassociate-address'
     'body': """
 
 @log.trace("Calling AWS-EC2 Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")
-                               .set("action","disassociate-address") #Contains the name of the operation
-                               .set("public-ip",${2:"192.168.45.45"}) #Address which is to be disassociated
-                               .set("region","${3:ap-southeast-1}") #Amazon EC2 region to which address was associated,default is "us-east-1"
-                               .set("security-key","${4:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your security key
-                               .set("access-key","${5:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}")  #Your secret access key
-                               .timeout(10000) #Execution time of the Flintbit in milliseconds
+                               .set("action","disassociate-address")       #Contains the name of the operation
+                               .set("public-ip","${2:Public IP}")               #Address which is to be disassociated
+                               .set("region","${3:Amazon EC2 region}")          #Amazon EC2 region to which address associated,default is "us-east-1"
+                               .set("security-key","${4:Your security key}")    #Your security key
+                               .set("access-key","${5:Your secret access key}") #Your secret access key
+                               .timeout(10000)                             #Execution time of the Flintbit in milliseconds
                                .sync
 
 #AWS-EC2 Connector Response Meta Parameters
@@ -617,12 +598,10 @@ ${6:response_exitcode} = ${1:connector_name}_response.exitcode #Exit status code
 ${7:response_message} = ${1:connector_name}_response.message #Execution status message
 
 if ${6:response_exitcode} == 0
-    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
-                                                        +' | message :: ' + ${7:response_message})
+    @log.info('Success in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
     @output.set("result",${7:response_message})
 else
-    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::' + ${6:response_exitcode}
-                                                         +' | message :: ' + ${7:response_message})
+    @log.error('Failure in executing AWS-EC2 Connector where, exitcode ::'+${6:response_exitcode.to_s}+' | message :: '+${7:response_message})
     @output.set("error",${7:response_message})
 end
 
