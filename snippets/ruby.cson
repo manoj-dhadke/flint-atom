@@ -101,11 +101,11 @@
 
   'Get global config':
     'prefix' : 'config-global'
-    'body' : '${1:aws}_username = @config.global("${2:aws.username}") # It gives value for username field from aws config'
+    'body' : '${1:path} = @config.global("${2:config_name.path}") # It gives value for path field from config_name'
 
   'Get local config':
     'prefix' : 'config-local'
-    'body' : '${1:aws}_username = @config.local("${2:aws.username}") # It gives value for username field from aws config'
+    'body' : '${1:path} = @config.local("${2:config_name.path}") # It gives value for path field from config_name'
 
   'Parse json string':
     'prefix' : 'parse-json'
