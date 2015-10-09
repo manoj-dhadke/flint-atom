@@ -1,0 +1,30 @@
+'.source.ruby':
+  'flint-mqtt-connector-template':
+    'prefix': 'call-mqtt-connector'
+    'body': """
+
+@log.trace("Calling MQTT Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+															 .set("action","${2:send}")														#Action of MQTT Connector
+															 .set("content","${3:your mqtt message}")							#Message to send on MQTT Topic
+															 .set("topic","${4:your_mqtt_topic}")                 #MQTT Topic name (Optinal)
+                               .set("broker","${5:tcp://localhost:1883}")           #MQTT broker url (Optinal)
+                               .set("client-id","${6:your_mqtt_client_id}")         #MQTT Client ID  (Optinal)
+                               .set("qos",${7:2})                                   #Quality of Service for MQTT Message, Default is 2 (Optional)
+                               .set("username","${8:username_for_mqtt_server}")     #Username for Authenticate MQTT Server (Optional)
+                               .set("password","${9:password_for_mqtt_server}")     #Password for Authenticate MQTT Server (Optional)
+                               .sync
+
+#MQTT Connector Response Meta Parameters
+${7:response_exitcode} = ${1:connector_name}_response.exitcode  #Exit status code
+${8:response_message} = ${1:connector_name}_response.message    #Execution status message
+
+if ${7:response_exitcode} == 0
+    @log.info('Success in executing MQTT Connector where, exitcode ::'+response_exitcode.to_s+' | message :: '+response_message)
+    @output.set("result",response_message)
+else
+    @log.error('Failure in executing MQTT Connector where, exitcode ::'+response_exitcode.to_s+' | message :: '+response_message)
+    @output.set("error",response_message)
+end
+
+"""
