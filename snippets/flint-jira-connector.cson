@@ -1,0 +1,230 @@
+'.source.ruby':
+  'Add comment in jira issue':
+    'prefix': 'call-jira-add-comment'
+    'body': """
+
+@log.trace("Calling jira Connector...")
+${1:connector_name}_response=@call.connector("${1:connector_name}")
+                                  .set("action","add-comment")                   #Contains the name of the operation(Mandatory)
+                                  .set("comment","${2:comment}")                      #Content of the comment in plain text  ( required )
+                                  .set("issue-id","${3:issue id}")                    #unique ID of an Issue  ( required )
+                                  .set("type","${4:type}")                            #for which type of user you want to restrict comment i.e. role
+                                  .set("value","${5:value}")                          #value of the role i.e. Administrators
+                                  .timeout(10000)                                #Execution time of the Flintbit in milliseconds (Optional)
+                                  .sync
+
+#Jira Service Desk Connector Response Meta Parameters
+${6:response_exitcode}=${1:connector_name}_response.exitcode                     #Exit status code
+${7:response_message} = ${1:connector_name}_response.message                     #Execution status messages
+
+#Jira Service Desk Connector Response Parameters
+${8:response_result} = ${1:connector_name}_response.get("result")                #Add Comment execution results
+if ${6:response_exitcode} == 0
+        @log.info('Success in executing Jira Service Desk Connector, where exitcode ::'+${6:response_exitcode}+'| message ::'+${7:response_message})
+        @log.info('Add Comment execution results ::' + ${8:response_result})
+        @output.set("result",${8:response_result}.to_s)
+else
+        @log.error('Failure in executing  Jira Service Desk Connector, where exitcode ::'+ ${6:response_exitcode}+'| message ::'+ ${7:response_message})
+        @output.set("error",${8:response_message})
+end
+
+"""
+
+  'Update comment in jira issue':
+    'prefix': 'call-jira-update-comment'
+    'body': """
+
+@log.trace("Calling jira Connector...")
+${1:connector_name}_response=@call.connector("${1:connector_name}")
+                                  .set("action","update-comment")                #Contains the name of the operation(Mandatory)
+                                  .set("comment","${2:comment}")                      #Content of the comment in plain text  ( required )
+                                  .set("issue-id","${3:issue id}")                    #unique ID of an Issue  ( required )
+                                  .set("type","${4:type}")                            #for which type of user you want to restrict comment i.e. role
+                                  .set("value","${5:value}")                          #value of the role i.e. Administrators
+                                  .set("comment-id","${6:comment_id}")                #Unique ID of comment (required)
+                                  .timeout(10000)                                #Execution time of the Flintbit in milliseconds (Optional)
+                                  .sync
+
+
+#Jira Service Desk Connector Response Meta Parameters
+${7:response_exitcode}=${1:connector_name}_response.exitcode                     #Exit status code
+${8:response_message} = ${1:connector_name}_response.message                     #Execution status messages
+
+#Jira Service Desk Connector Response Parameters
+${9:response_result} = ${1:connector_name}_response.get("result")                #Update Comment execution results
+if ${6:response_exitcode} == 0
+        @log.info('Success in executing Jira Service Desk Connector, where exitcode ::'+${7:response_exitcode}+'| message ::'+${8:response_message})
+        @log.info('Update Comment execution results ::' + ${9:response_result})
+        @output.set("result",${8:response_result}.to_s)
+else
+        @log.error('Failure in executing  Jira Service Desk Connector, where exitcode ::'+ ${7:response_exitcode}+'| message ::'+ ${8:response_message})
+        @output.set("error",${8:response_message})
+end
+
+"""
+
+  'Create issue in jira':
+    'prefix': 'call-jira-create-issue'
+    'body': """
+
+@log.trace("Calling jira Connector...")
+${1:connector_name}_response=@call.connector("${1:connector_name}")
+                                  .set("action","create-issue")                 #Contains the name of the operation(Mandatory)
+                                  .set("summary","${2:summary}")                     #Title of issue. (Mandatory)
+	                                .set("description","${3:description}")             #Description related to issue (Mandetory)
+	                                .set("issuetype","${4:issue type}")                #Type of issue. i.e Service Request, incident, Problem or Change (Mandatory)
+	                                .set("priority","${5:priority}")                   #Priority of issue. i.e. Highest=1, High=2, Medium=3, Low=4, Lowest=5 (Optional)
+	                                .set("components","${6:components}")               #Array of String components id.
+	                                .set("labels","${7:labels}")                       #Array of String lables
+	                                .set("duedate","${8:duedate}")                     #Due date of issue
+	                                .set("reporter","${9:reporter}")                   #Reporter of the issue
+	                                .set("assignee","${10:assignee}")                   #Assignee of the isssue
+                                  .set("custom-field","${11:custom_field}")           #JsonArray of custom fields
+                                  .timeout(10000)                               #Execution time of the Flintbit in milliseconds (Optional)
+                                  .sync
+
+
+#Jira Service Desk Connector Response Meta Parameters
+${12:response_exitcode}=${1:connector_name}_response.exitcode                     #Exit status code
+${13:response_message} = ${1:connector_name}_response.message                     #Execution status messages
+
+#Jira Service Desk Connector Response Parameters
+${14:response_result} = ${1:connector_name}_response.get("result")                #Create issue execution results
+if ${12:response_exitcode} == 0
+        @log.info('Success in executing Jira Service Desk Connector, where exitcode ::'+${12:response_exitcode}+'| message ::'+${13:response_message})
+        @log.info('Create issue execution results ::' + ${14:response_result})
+        @output.set("result",${14:response_result}.to_s)
+else
+        @log.error('Failure in executing  Jira Service Desk Connector, where exitcode ::'+ ${12:response_exitcode}+'| message ::'+ ${13:response_message})
+        @output.set("error",${13:response_message})
+end
+
+"""
+
+
+  'get user in jira':
+    'prefix': 'call-jira-get-user'
+    'body': """
+
+@log.trace("Calling jira Connector...")
+${1:connector_name}_response=@call.connector("${1:connector_name}")
+                                .set("action","get-user")                       #Contains the name of the operation(Mandatory)
+                                .set("username", "${2:username}")                    #User name that you wants to retrive information
+                                .timeout(10000)                                 #Execution time of the Flintbit in milliseconds (Optional)
+                                .sync
+
+
+#Jira Service Desk Connector Response Meta Parameters
+${3:response_exitcode}=${1:connector_name}_response.exitcode                     #Exit status code
+${4:response_message} = ${1:connector_name}_response.message                     #Execution status messages
+
+#Jira Service Desk Connector Response Parameters
+${5:response_result} = ${1:connector_name}_response.get("result")                #get user execution results
+if ${3:response_exitcode} == 0
+      @log.info('Success in executing Jira Service Desk Connector, where exitcode ::'+${3:response_exitcode}+'| message ::'+${4:response_message})
+      @log.info('Get user execution results ::' + ${5:response_result})
+      @output.set("result",${5:response_result}.to_s)
+else
+      @log.error('Failure in executing  Jira Service Desk Connector, where exitcode ::'+ ${3:response_exitcode}+'| message ::'+ ${4:response_message})
+      @output.set("error",${4:response_message})
+end
+
+"""
+  'Resolve issue in jira':
+    'prefix': 'call-jira-resolve-issue'
+    'body': """
+
+@log.trace("Calling jira Connector...")
+${1:connector_name}_response=@call.connector("${1:connector_name}")
+                                .set("action","resolve-issue")                  #Contains the name of the operation(Mandatory)
+                                .set("comment","${2:comment}")                       #Comment if you want to add  comment after resolving issue.
+                                .set("issue-id","${3:issue id}")                     #Issue id that you want to resolved.(Required)
+                                .timeout(10000)                                 #Execution time of the Flintbit in milliseconds (Optional)
+                                .sync
+
+
+#Jira Service Desk Connector Response Meta Parameters
+${4:response_exitcode}=${1:connector_name}_response.exitcode                     #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                     #Execution status messages
+
+#Jira Service Desk Connector Response Parameters
+${6:response_result} = ${1:connector_name}_response.get("result")                #resolve issue execution results
+if ${4:response_exitcode} == 0
+      @log.info('Success in executing Jira Service Desk Connector, where exitcode ::'+${4:response_exitcode}+'| message ::'+${5:response_message})
+      @log.info('Resolve issue execution results ::' + ${6:response_result})
+      @output.set("result",${6:response_result}.to_s)
+else
+      @log.error('Failure in executing  Jira Service Desk Connector, where exitcode ::'+ ${4:response_exitcode}+'| message ::'+ ${5:response_message})
+      @output.set("error",${5:response_message})
+end
+
+"""
+
+  'Add worklog ':
+    'prefix': 'call-jira-add-worklog'
+    'body': """
+
+@log.trace("Calling jira Connector...")
+${1:connector_name}_response=@call.connector("${1:connector_name}")
+                                .set("action","add-worklog")                    #Contains the name of the operation(Mandatory)
+                                .set("comment","${2:comment}")                       #Comment if you want to add  comment after resolving issue.
+                                .set("issue-id","${3:issue id}")                     #Issue id that you want to resolved.(Required)
+                                .set("started","${4:started}")                   #Started time
+	                              .set("timeSpent","${5:time spent}")              #Total time spent e.g 2d 3h 1m
+                                .set("adjust-estimate","${6:adjust estimate}")   #possible values for adjust estimate are: new,manual,auto and leave
+                                .timeout(10000)                                 #Execution time of the Flintbit in milliseconds (Optional)
+                                .sync
+
+
+#Jira Service Desk Connector Response Meta Parameters
+${7:response_exitcode}=${1:connector_name}_response.exitcode                     #Exit status code
+${8:response_message} = ${1:connector_name}_response.message                     #Execution status messages
+
+#Jira Service Desk Connector Response Parameters
+${9:response_result} = ${1:connector_name}_response.get("result")                #add worklog execution results
+if ${7:response_exitcode} == 0
+      @log.info('Success in executing Jira Service Desk Connector, where exitcode ::'+${7:response_exitcode}+'| message ::'+${8:response_message})
+      @log.info('Add worklog execution results ::' + ${9:response_result})
+      @output.set("result",${9:response_result}.to_s)
+else
+      @log.error('Failure in executing  Jira Service Desk Connector, where exitcode ::'+ ${7:response_exitcode}+'| message ::'+ ${8:response_message})
+      @output.set("error",${8:response_message})
+end
+
+"""
+
+  'Notify ':
+    'prefix': 'call-jira-notify'
+    'body': """
+
+@log.trace("Calling jira Connector...")
+${1:connector_name}_response=@call.connector("${1:connector_name}")
+                                .set("action","notify")                         #Contains the name of the operation(Mandatory)
+                                .set("comment","${2:comment}")                       #Comment if you want to add  comment after resolving issue.
+                                .set("issue-id","${3:issue id}")                     #Issue id that you want to resolved.(Required)
+                                .set("body","${4:body}")                             #Email body
+                                .set("subject","${5:subject}")                       #Email subject
+                                .set("reporter","${6:reporter}")                     #if you want notify to reporter
+                                .set("assignee","${7:assignee}")                     #if you want notify to assignee
+                                .set("watcher","${8:watcher}")                       #if you want to notify watcher
+                                .set("voters","${9:voters}")                         #if you want to notify voters
+                                .timeout(10000)                                 #Execution time of the Flintbit in milliseconds (Optional)
+                                .sync
+
+
+#Jira Service Desk Connector Response Meta Parameters
+${10:response_exitcode}=${1:connector_name}_response.exitcode                     #Exit status code
+${11:response_message} = ${1:connector_name}_response.message                     #Execution status messages
+
+#Jira Service Desk Connector Response Parameters
+${12:response_result} = ${1:connector_name}_response.get("result")                #notify execution results
+if ${10:response_exitcode} == 0
+      @log.info('Success in executing Jira Service Desk Connector, where exitcode ::'+${10:response_exitcode}+'| message ::'+${11:response_message})
+      @log.info('Notify execution results ::' + ${12:response_result})
+      @output.set("result",${12:response_result}.to_s)
+else
+      @log.error('Failure in executing  Jira Service Desk Connector, where exitcode ::'+ ${10:response_exitcode}+'| message ::'+ ${11:response_message})
+      @output.set("error",${11:response_message})
+end
+
+"""
