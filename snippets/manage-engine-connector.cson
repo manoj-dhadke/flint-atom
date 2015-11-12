@@ -1,0 +1,130 @@
+'.source.ruby':
+  'Get request in Manage Engine Service Desk':
+    'prefix': 'call-manage-engine-get-request'
+    'body': """
+
+@log.trace("Calling Manage Engine Service Desk Connector...")
+  ${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                .set("action","get-request")                    #Contains the name of the operation(Mandatory)
+                                .set("request-id","${2:request id}")                 #Unique identifier for request
+                                .timeout(10000)                                 #Execution time of the Flintbit in milliseconds (Optional)
+                                .sync
+
+    #Manage Engine Connector Response Meta Parameters
+    ${3:response_exitcode}=${1:connector_name}_response.exitcode                                          #Exit status code
+    ${4:response_message} = ${1:connector_name}_response.message                                          #Execution status messages
+
+    #Manage Engine Connector Response Parameters
+    ${5:response_result} = ${1:connector_name}_response.get("result") #get request execution results
+
+       if ${3:response_exitcode} == 0
+            @log.info('Success in executing Manage Engine Servicedesk Connector, where exitcode ::'+${3:response_exitcode}+'| message ::'+${4:response_message})
+            @log.info('Get Request execution results ::' + ${5:response_result})
+            @output.set("result",${5:response_result}.to_s)
+       else
+            @log.error('Failure in executing Manage Engine Servicedesk Connector, where exitcode ::'+ ${3:response_exitcode}+'| message ::'+ ${4:response_message})
+            @output.set("error",${4:response_message})
+       end
+
+    """
+
+  'Close request in Manage Engine Service Desk':
+    'prefix':'call-manage-engine-close-request'
+    'body':"""
+
+    @log.trace("Calling Manage Engine Service Desk Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                    .set("action","close-request")                 #Contains the name of the operation(Mandatory)
+                                    .set("request-id","${2:request id}")                #Unique identifier for request
+                                    .set("close-accepted","${3:Accepted}")              #
+                                    .set("close-comment","${4:Comment}")                #Comment that you wants to add while closing request
+                                    .timeout(10000)
+                                    .sync
+
+#Manage Engine Connector Response Meta Parameters
+${3:response_exitcode}=${1:connector_name}_response.exitcode                                          #Exit status code
+${4:response_message} = ${1:connector_name}_response.message                                          #Execution status messages
+
+#Manage Engine Connector Response Parameters
+${5:response_result} = ${1:connector_name}_response.get("result") #close request execution results
+
+   if ${3:response_exitcode} == 0
+        @log.info('Success in executing Manage Engine Servicedesk Connector, where exitcode ::'+${3:response_exitcode}+'| message ::'+${4:response_message})
+        @log.info('Close Request execution results ::' + ${5:response_result})
+        @output.set("result",${5:response_result}.to_s)
+   else
+        @log.error('Failure in executing Manage Engine Servicedesk Connector, where exitcode ::'+ ${3:response_exitcode}+'| message ::'+ ${4:response_message})
+        @output.set("error",${4:response_message})
+   end
+    """
+
+   'Update request in Manage Engine Service Desk':
+    'prefix':'call-mange-engine-update-request'
+    'body':"""
+
+@log.trace("Calling Manage Engine Service Desk Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                    .set("action","update-request")             #Contains the name of the operation(Mandatory)
+                                    .set("request-id","${2:Request id}")             #Unique identifier for request
+                                    .set("requester","${3:Requester}")               #Requester of the request
+                                    .set("subject","${4:Subject}")                   #Subject of the request
+                                    .set("description","${5:Description}")           #Description of the request
+                                    .set("requesttemplate","${6:Request Template}")  #Template of the request
+                                    .set("priority","${7:Priority}")                 #Priority of the request
+                                    .set("site","${8:Site}")                         #Site of the request
+                                    .set("group","${9:Group}")                       #Group in which request associated
+                                    .set("technician","${10:Technician}")             #Technician assigned to request
+                                    .set("level","${11:Level}")                       #Level of the request
+                                    .set("status","${12:Status}")                     #Status of the request
+                                    .set("service","${13:Service}")                   #Service category to which the request belongs
+                                    .timeout(10000)
+                                    .sync
+
+
+#Manage Engine Connector Response Meta Parameters
+${14:response_exitcode}=${1:connector_name}_response.exitcode                                          #Exit status code
+${15:response_message} = ${1:connector_name}_response.message                                          #Execution status messages
+
+#Manage Engine Connector Response Parameters
+${16:response_result} = ${1:connector_name}_response.get("result") #Update request execution results
+
+   if ${14:response_exitcode} == 0
+        @log.info('Success in executing Manage Engine Servicedesk Connector, where exitcode ::'+${14:response_exitcode}+'| message ::'+${15:response_message})
+        @log.info('Update Request execution results ::' + ${16:response_result})
+        @output.set("result",${16:response_result}.to_s)
+   else
+        @log.error('Failure in executing Manage Engine Servicedesk Connector, where exitcode ::'+ ${14:response_exitcode}+'| message ::'+ ${15:response_message})
+        @output.set("error",${15:response_message})
+   end
+
+    """
+
+  'Add Note in Manage Engine Servicedesk':
+    'prefix':'call-mange-engine-add-note'
+    'body':"""
+
+@log.trace("Calling Manage Engine Service Desk Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")
+                                    .set("action", "add-note")                  #Contains the name of the operation(Mandatory)
+                                    .set("request-id","${2:request id}")             #Unique identifier for request
+                                    .set("ispublic","${3:is public}")                #Used to represent whether note is public or private
+                                    .set("notetext","${4:Note text}")                #Text to be entered as note
+                                    .timeout(10000)
+                                    .sync
+
+  #Manage Engine Connector Response Meta Parameters
+  ${5:response_exitcode}=${1:connector_name}_response.exitcode                                          #Exit status code
+  ${6:response_message} = ${1:connector_name}_response.message                                          #Execution status messages
+
+  #Manage Engine Connector Response Parameters
+  ${7:response_result} = ${1:connector_name}_response.get("result") #close request execution results
+
+     if ${5:response_exitcode} == 0
+          @log.info('Success in executing Manage Engine Servicedesk Connector, where exitcode ::'+${5:response_exitcode}+'| message ::'+${6:response_message})
+          @log.info('Add note execution results ::' + ${7:response_result})
+          @output.set("result",${7:response_result}.to_s)
+     else
+          @log.error('Failure in executing Manage Engine Servicedesk Connector, where exitcode ::'+ ${5:response_exitcode}+'| message ::'+ ${6:response_message})
+          @output.set("error",${6:response_message})
+     end
+    """
