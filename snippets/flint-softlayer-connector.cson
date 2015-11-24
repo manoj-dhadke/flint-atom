@@ -20,21 +20,21 @@
 ${1:connector_name}_response = @call.connector("${1:connector_name}")                      #Contains the name of the connector (Mandatory)
                                .set("action","start")                            #Contains the name of the operation (Mandatory)
                                .set("id",id)                                     #Contains the id of the machine (Mandatory)
-                               .set("apikey","${4:your api key}")                     #Your softlayer account key (Optional)
-                               .set("username","${5:your username}")                  #Your softlayer username (Optional)
+                               .set("apikey","${2:your api key}")                     #Your softlayer account key (Optional)
+                               .set("username","${3:your username}")                  #Your softlayer username (Optional)
                                .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                               #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                               #Execution status messages
+${4:response_exitcode}=${1:connector_name}_response.exitcode                               #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                               #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:response_power} = ${1:connector_name}_response.get("power-on")                         #Machine start State
-${8:response_state} = ${1:connector_name}_response.get("vm-state")                         #Machine State
+${6:response_power} = ${1:connector_name}_response.get("power-on")                         #Machine start State
+${7:response_state} = ${1:connector_name}_response.get("vm-state")                         #Machine State
 
-if ${5:response_exitcode} == 0
+if ${4:response_exitcode} == 0
 
    @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
@@ -60,23 +60,23 @@ end
 
 @log.trace("Calling softlayer Connector...")
 ${1:connector_name}_response = @call.connector("${1:connector_name}")                       #Contains the name of the connector (Mandatory)
-                               .set("action","stop")                             #Contains the name of the operation (Mandatory)
+                               .set("action","stop")                              #Contains the name of the operation (Mandatory)
                                .set("id",id)                                      #Contains the id of the machine (Mandatory)
-                               .set("apikey","${4:your api key}")                      #Your softlayer account key (Optional)
-                               .set("username","${5:your username}")                   #Your softlayer username (Optional)
+                               .set("apikey","${2:your api key}")                      #Your softlayer account key (Optional)
+                               .set("username","${3:your username}")                   #Your softlayer username (Optional)
                                .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                                #Execution status messages
+${4:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                                #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:response_power} = ${1:connector_name}_response.get("power-off")                          #Machine stop state
-${8:response_state} = ${1:connector_name}_response.get("vm-state")                           #Machine State
+${6:response_power} = ${1:connector_name}_response.get("power-off")                          #Machine stop state
+${7:response_state} = ${1:connector_name}_response.get("vm-state")                           #Machine State
 
-if ${5:response_exitcode} == 0
+if ${4:response_exitcode} == 0
 
    @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
@@ -101,22 +101,22 @@ end
     'body': """
 
 @log.trace("Calling softlayer Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")                       #Contains the name of the connector (Mandatory)
-                             .set("action","list")                             #Contains the name of the operation (Mandatory)
-                             .set("apikey","${4:your api key}")                      #Your softlayer account key (Optional)
-                             .set("username","${5:your username}")                   #Your softlayer username (Optional)
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                             .set("action","list")                              #Contains the name of the operation (Mandatory)
+                             .set("apikey","${2:your api key}")                      #Your softlayer account key (Optional)
+                             .set("username","${3:your username}")                   #Your softlayer username (Optional)
                              .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                                #Execution status messages
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:instance_list} = ${1:connector_name}_response.get("vm-list")                          #Machine list
+${6:instance_list} = ${1:connector_name}_response.get("vm-list")                          #Machine list
 
-if ${5:response_exitcode} == 0
+if ${4:response_exitcode} == 0
 
  @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
@@ -139,23 +139,23 @@ end
     'body': """
 
 @log.trace("Calling softlayer Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")                       #Contains the name of the connector (Mandatory)
-                             .set("action","reboot")                             #Contains the name of the operation (Mandatory)
-                              .set("id",id)                                      #Contains the id of the machine (Mandatory)
-                             .set("apikey","${4:your api key}")                      #Your softlayer account key (Optional)
-                             .set("username","${5:your username}")                   #Your softlayer username (Optional)
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                             .set("action","reboot")                            #Contains the name of the operation (Mandatory)
+                             .set("id",id)                                      #Contains the id of the machine (Mandatory)
+                             .set("apikey","${2:your api key}")                      #Your softlayer account key (Optional)
+                             .set("username","${3:your username}")                   #Your softlayer username (Optional)
                              .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                                #Execution status messages
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:instance_reboot} = ${1:connector_name}_response.get("isreboot")                          #Machine list
+${6:instance_reboot} = ${1:connector_name}_response.get("isreboot")                       #Machine reboot state
 
-if ${5:response_exitcode} == 0
+if ${4:response_exitcode} == 0
 
  @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
@@ -178,23 +178,23 @@ end
     'body': """
 
 @log.trace("Calling softlayer Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")                       #Contains the name of the connector (Mandatory)
-                             .set("action","reset")                             #Contains the name of the operation (Mandatory)
-                              .set("id",id)                                      #Contains the id of the machine (Mandatory)
-                             .set("apikey","${4:your api key}")                      #Your softlayer account key (Optional)
-                             .set("username","${5:your username}")                   #Your softlayer username (Optional)
-                             .sync
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                              .set("action","reset")                            #Contains the name of the operation (Mandatory)
+                              .set("id",id)                                     #Contains the id of the machine (Mandatory)
+                              .set("apikey","${2:your api key}")                     #Your softlayer account key (Optional)
+                              .set("username","${3:your username}")                  #Your softlayer username (Optional)
+                              .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                                #Execution status messages
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:instance_reset} = ${1:connector_name}_response.get("reset")                          #Machine list
-${8:instance_state} = ${1:connector_name}_response.get("vm-state")                           #Machine State
-if ${5:response_exitcode} == 0
+${6:instance_reset} = ${1:connector_name}_response.get("reset")                           #Machine reset state
+${7:instance_state} = ${1:connector_name}_response.get("vm-state")                        #Machine State
+if ${4:response_exitcode} == 0
 
  @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
@@ -217,23 +217,23 @@ end
     'body': """
 
 @log.trace("Calling softlayer Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")                       #Contains the name of the connector (Mandatory)
-                             .set("action","details")                             #Contains the name of the operation (Mandatory)
-                              .set("id",id)                                      #Contains the id of the machine (Mandatory)
-                             .set("apikey","${4:your api key}")                      #Your softlayer account key (Optional)
-                             .set("username","${5:your username}")                   #Your softlayer username (Optional)
-                             .sync
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                              .set("action","details")                          #Contains the name of the operation (Mandatory)
+                              .set("id",id)                                     #Contains the id of the machine (Mandatory)
+                              .set("apikey","${2:your api key}")                     #Your softlayer account key (Optional)
+                              .set("username","${3:your username}")                  #Your softlayer username (Optional)
+                              .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                                #Execution status messages
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:instance_details} = ${1:connector_name}_response.get("vm-details")                          #Machine list
+${6:instance_details} = ${1:connector_name}_response.get("vm-details")                    #Machine details
 
-if ${5:response_exitcode} == 0
+if ${4:response_exitcode} == 0
 
  @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
@@ -255,26 +255,26 @@ end
     'body': """
 
 @log.trace("Calling softlayer Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")                       #Contains the name of the connector (Mandatory)
-                             .set("action","update")                             #Contains the name of the operation (Mandatory)
-                              .set("id",id)                                      #Contains the id of the machine (Mandatory)
-                              .set("host-name","${2:your hostname}")               #Contains the domainname of the machine (Optional)
-                              .set("domain-name","${3:your domainname}")           #Contains the hostname of the machine (Optional)
-                              .set("full-name","${4:your full name}")              #Contains the full-name of the machine (Optional)
-                             .set("apikey","${5:your api key}")                      #Your softlayer account key (Optional)
-                             .set("username","${6:your username}")                   #Your softlayer username (Optional)
-                             .sync
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                              .set("action","update")                           #Contains the name of the operation (Mandatory)
+                              .set("id",id)                                     #Contains the id of the machine (Mandatory)
+                              .set("host-name","${2:your hostname}")                 #Contains the domainname of the machine (Optional)
+                              .set("domain-name","${3:your domainname}")             #Contains the hostname of the machine (Optional)
+                              .set("full-name","${4:your full name}")                #Contains the full-name of the machine (Optional)
+                              .set("apikey","${5:your api key}")                     #Your softlayer account key (Optional)
+                              .set("username","${6:your username}")                  #Your softlayer username (Optional)
+                              .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                                #Execution status messages
+${7:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${8:response_message} = ${1:connector_name}_response.message                              #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:instance_details} = ${1:connector_name}_response.get("vm-details")                          #Machine list
+${9:instance_details} = ${1:connector_name}_response.get("vm-details")                    #Machine list
 
-if ${5:response_exitcode} == 0
+if ${7:response_exitcode} == 0
 
  @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
@@ -296,29 +296,72 @@ end
     'body': """
 
 @log.trace("Calling softlayer Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")                       #Contains the name of the connector (Mandatory)
-                             .set("action","delete")                             #Contains the name of the operation (Mandatory)
-                              .set("id",id)                                      #Contains the id of the machine (Mandatory)
-                             .set("apikey","${4:your api key}")                      #Your softlayer account key (Optional)
-                             .set("username","${5:your username}")                   #Your softlayer username (Optional)
-                             .sync
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                              .set("action","delete")                           #Contains the name of the operation (Mandatory)
+                              .set("id",id)                                     #Contains the id of the machine (Mandatory)
+                              .set("apikey","${2:your api key}")                     #Your softlayer account key (Optional)
+                              .set("username","${3:your username}")                  #Your softlayer username (Optional)
+                              .sync
 
 
 #Softlayer Connector Response Meta Parameters
-${5:response_exitcode}=${1:connector_name}_response.exitcode                                #Exit status code
-${6:response_message} = ${1:connector_name}_response.message                                #Execution status messages
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
 
 
 #Softlayer Connector Response Parameters
-${7:instance_deleted} = ${1:connector_name}_response.get("delete")                          #Machine list
+${6:instance_deleted} = ${1:connector_name}_response.get("delete")                        #Machine delete status
 
-if ${5:response_exitcode} == 0
+if ${4:response_exitcode} == 0
 
  @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
  @log.info('Machine deleted :: '+instance_deleted.to_s)
 
- @output.setraw("instance-deleted",instance_deleted.to_s)
+ @output.set("instance-deleted",instance_deleted.to_s)
+else
+
+ @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+ @output.exit(1,response_message)
+
+
+end
+
+"""
+
+  'Create softlayer instance':
+    'prefix': 'call-softlayer-create-instance'
+    'body': """
+
+@log.trace("Calling softlayer Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                             .set("action","create")                            #Contains the name of the operation (Mandatory)
+                              .set("host-name","${2:your hostname}")                 #Contains the domainname of the machine (Mandatory)
+                              .set("domain-name","${3:your domainname}")             #Contains the hostname of the machine (Mandatory)
+                              .set("cpu","no of cpu you want")                  #Contains the no of cpu required for the machine (Mandatory) value(Integer)
+                              .set("max-memory","max memory you want")          #Contains the no of memory required for the machine (Mandatory)  value(Integer)
+                              .set("opearting-system","${4:operating system you want for your machine}") #Contains the opearting system required for the machine (Mandatory)
+                              .set("datacenter","${5:location where you want your vm}")  #Contains the name of the datacenter required for the machine (Mandatory)
+                              .set("apikey","${6:your api key}")                      #Your softlayer account key (Optional)
+                              .set("username","${7:your username}")                   #Your softlayer username (Optional)
+                              .sync
+
+
+#Softlayer Connector Response Meta Parameters
+${8:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${9:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#Softlayer Connector Response Parameters
+${10:instance_id} = ${1:connector_name}_response.get("id")                                 #Machine id
+${11:instance_domainName} = ${1:connector_name}_response.get("domainName")                 #Machine domain name
+if ${8:response_exitcode} == 0
+
+ @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+ @log.info('Machine id :: '+instance_id.to_s+'Machine domain name :: '+instance_domainName.to_s)
+ @output.set("instance-domainName",instance_domainName.to_s)
+ @output.set("instance-id",instance_id.to_s)
 else
 
  @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
