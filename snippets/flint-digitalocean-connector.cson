@@ -1,0 +1,334 @@
+# An example CoffeeScript snippet to expand log to console.log:
+#
+# '.source.coffee':
+#   'Console log':
+#     'prefix': 'log'
+#     'body': 'console.log $1'
+#
+# Each scope (e.g. '.source.coffee' above) can only be declared once.
+#
+# This file uses CoffeeScript Object Notation (CSON).
+# If you are unfamiliar with CSON, you can read more about it in the
+# Atom Flight Manual:
+
+'.source.ruby':
+  'Start digitalocean instance':
+    'prefix': 'call-digitalocean-start-instance'
+    'body': """
+
+ @log.trace("Calling digitalocean Connector...")
+ ${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                                .set("action","start")                           #Contains the name of the operation (Mandatory)
+                                .set("id",id)                                    #Contains the id of the machine (Mandatory)
+                                .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                                .sync
+
+
+ #DigitalOcean Connector Response Meta Parameters
+ ${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+ ${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+ #DigitalOcean Connector Response Parameters
+ ${6:action_id} = ${1:connector_name}_response.get("action-id")                            #Id of the action performed
+ ${7:resource_id} = ${1:connector_name}_response.get("resource-id")                        #Id of the resource on which action is performed
+ ${8:resource_type} = ${1:connector_name}_response.get("resource-type")                    #Type of the resource
+ ${9:action_type} = ${1:connector_name}_response.get("action-type")                        #Action type
+ ${10:action_status} = ${1:connector_name}_response.get("action-status")                    #Action status
+
+ if ${4:response_exitcode} == 0
+
+    @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+    @log.info('Action performed :: '+action_type.to_s+' | Action State  ::'+action_status.to_s)
+
+    @output.setraw("response",${1:connector_name}_response.to_s)
+
+ else
+
+    @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+    @output.exit(1,response_message)
+
+
+ end
+
+ """
+
+  'Stop digitalocean instance':
+    'prefix': 'call-digitalocean-stop-instance'
+    'body': """
+
+@log.trace("Calling digitalocean Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                               .set("action","stop")                            #Contains the name of the operation (Mandatory)
+                               .set("id",id)                                    #Contains the id of the machine (Mandatory)
+                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                               .sync
+
+
+#DigitalOcean Connector Response Meta Parameters
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#DigitalOcean Connector Response Parameters
+${6:action_id} = ${1:connector_name}_response.get("action-id")                            #Id of the action performed
+${7:resource_id} = ${1:connector_name}_response.get("resource-id")                        #Id of the resource on which action is performed
+${8:resource_type} = ${1:connector_name}_response.get("resource-type")                    #Type of the resource
+${9:action_type} = ${1:connector_name}_response.get("action-type")                        #Action type
+${10:action_status} = ${1:connector_name}_response.get("action-status")                    #Action status
+
+if ${4:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+   @log.info('Action performed :: '+action_type.to_s+' | Action State  ::'+action_status.to_s)
+
+  @output.setraw("response",${1:connector_name}_response.to_s)
+
+else
+
+   @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+   @output.exit(1,response_message)
+
+
+end
+
+"""
+
+  'Reboot digitalocean instance':
+    'prefix': 'call-digitalocean-reboot-instance'
+    'body': """
+
+@log.trace("Calling digitalocean Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                               .set("action","reboot")                           #Contains the name of the operation (Mandatory)
+                               .set("id",id)                                    #Contains the id of the machine (Mandatory)
+                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                               .sync
+
+
+#DigitalOcean Connector Response Meta Parameters
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#DigitalOcean Connector Response Parameters
+${6:action_id} = ${1:connector_name}_response.get("action-id")                            #Id of the action performed
+${7:resource_id} = ${1:connector_name}_response.get("resource-id")                        #Id of the resource on which action is performed
+${8:resource_type} = ${1:connector_name}_response.get("resource-type")                    #Type of the resource
+${9:action_type} = ${1:connector_name}_response.get("action-type")                        #Action type
+${10:action_status} = ${1:connector_name}_response.get("action-status")                    #Action status
+
+if ${4:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+   @log.info('Action performed :: '+action_type.to_s+' | Action State  ::'+action_status.to_s)
+
+     @output.setraw("response",${1:connector_name}_response.to_s)
+else
+
+   @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+   @output.exit(1,response_message)
+
+
+end
+
+"""
+
+  'Reset digitalocean instance':
+    'prefix': 'call-digitalocean-reset-instance'
+    'body': """
+
+@log.trace("Calling digitalocean Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                               .set("action","reset")                            #Contains the name of the operation (Mandatory)
+                               .set("id",id)                                    #Contains the id of the machine (Mandatory)
+                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                               .sync
+
+
+#DigitalOcean Connector Response Meta Parameters
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#DigitalOcean Connector Response Parameters
+${6:action_id} = ${1:connector_name}_response.get("action-id")                            #Id of the action performed
+${7:resource_id} = ${1:connector_name}_response.get("resource-id")                        #Id of the resource on which action is performed
+${8:resource_type} = ${1:connector_name}_response.get("resource-type")                    #Type of the resource
+${9:action_type} = ${1:connector_name}_response.get("action-type")                        #Action type
+${10:action_status} = ${1:connector_name}_response.get("action-status")                   #Action status
+
+if ${4:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+   @log.info('Action performed :: '+action_type.to_s+' | Action State  ::'+action_status.to_s)
+
+    @output.setraw("response",${1:connector_name}_response.to_s)
+
+else
+
+   @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+   @output.exit(1,response_message)
+
+
+end
+
+"""
+
+  'List digitalocean instance':
+    'prefix': 'call-digitalocean-list-instance'
+    'body': """
+
+@log.trace("Calling digitalocean Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                               .set("action","list")                            #Contains the name of the operation (Mandatory)
+                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                               .sync
+
+
+#DigitalOcean Connector Response Meta Parameters
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#DigitalOcean Connector Response Parameters
+${6:list_instance} = ${1:connector_name}_response.get("dropletlist")                      #list of the instances
+
+
+if ${4:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+   @log.info('List of instances:: '+list_instance.to_s)
+
+   @output.set("list",list_instance.to_s)
+
+else
+
+   @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+   @output.exit(1,response_message)
+
+
+end
+
+"""
+
+  'detail digitalocean instance':
+    'prefix': 'call-digitalocean-detail-instance'
+    'body': """
+
+@log.trace("Calling digitalocean Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                               .set("action","detail")                          #Contains the name of the operation (Mandatory)
+                               .set("id",id)                                    #Contains the id of the machine (Mandatory)
+                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                               .sync
+
+
+#DigitalOcean Connector Response Meta Parameters
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#DigitalOcean Connector Response Parameters
+${6:instance_detail} = ${1:connector_name}_response.get("info")                           #Details of instance
+
+if ${4:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+   @log.info('Instance details :: '+instance_detail.to_s)
+
+   @output.setraw("machine-detail",${1:connector_name}_response.to_s)
+else
+
+   @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+   @output.exit(1,response_message)
+
+
+end
+
+"""
+
+  'delete digitalocean instance':
+    'prefix': 'call-digitalocean-delete-instance'
+    'body': """
+
+@log.trace("Calling digitalocean Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                               .set("action","delete")                          #Contains the name of the operation (Mandatory)
+                               .set("id",id)                                    #Contains the id of the machine (Mandatory)
+                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                               .sync
+
+
+#DigitalOcean Connector Response Meta Parameters
+${4:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${5:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#DigitalOcean Connector Response Parameters
+${6:request_access} = ${1:connector_name}_response.get("request-access")                  #state of request access
+${7:status_code} = ${1:connector_name}_response.get("status-code")                        #status of the request
+
+if ${4:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+   @log.info('Instance request access :: '+request_access.to_s+'request status code ::'+status_code.to_s)
+
+    @output.setraw("response",${1:connector_name}_response.to_s)
+else
+
+   @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+   @output.exit(1,response_message)
+
+
+end
+
+"""
+
+  'create digitalocean instance':
+    'prefix': 'call-digitalocean-create-instance'
+    'body': """
+
+@log.trace("Calling digitalocean Connector...")
+${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
+                               .set("action","create")                          #Contains the name of the operation (Mandatory)
+                               .set("name","name of your droplet")                                    #Contains the id of the machine (Mandatory)
+                               .set("region","location where you want your vm")
+                               .set("image","image you want for your vm")
+                               .set("size","size that you wish to select for this Droplet")
+                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+                               .sync
+
+
+#DigitalOcean Connector Response Meta Parameters
+${3:response_exitcode}=${1:connector_name}_response.exitcode                              #Exit status code
+${4:response_message} = ${1:connector_name}_response.message                              #Execution status messages
+
+
+#DigitalOcean Connector Response Parameters
+${5:request_access} = ${1:connector_name}_response.get("request-access")                  #state of request access
+${6:status_code} = ${1:connector_name}_response.get("status-code")                        #status of the request
+
+if ${3:response_exitcode} == 0
+
+   @log.info('SUCCESS in executing DigitalOcean Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
+
+   @log.info('Instance request access :: '+request_access.to_s+'request status code ::'+status_code.to_s)
+
+    @output.setraw("response",${1:connector_name}_response.to_s)
+else
+
+   @log.error('ERROR in executing DigitalOcean connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
+   @output.exit(1,response_message)
+
+
+end
+
+"""
