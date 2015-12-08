@@ -297,13 +297,13 @@ end
     'body': """
 
 @log.trace("Calling digitalocean Connector...")
-${1:connector_name}_response = @call.connector("${1:connector_name}")                     #Contains the name of the connector (Mandatory)
-                               .set("action","create")                          #Contains the name of the operation (Mandatory)
-                               .set("name","name of your droplet")                                    #Contains the id of the machine (Mandatory)
-                               .set("region","location where you want your vm")
-                               .set("image","image you want for your vm")
-                               .set("size","size that you wish to select for this Droplet")
-                               .set("token","${2:your token generated from account}")#Your digitalocean account token (Optional)
+${1:connector_name}_response = @call.connector("${1:connector_name}")                                  #Contains the name of the connector (Mandatory)
+                               .set("action","create")                                       #Contains the name of the operation (Mandatory)
+                               .set("name","name of your droplet")                           #Contains the name of the machine (Mandatory)
+                               .set("region","location where you want your vm")              #Contains the region of the machine (Mandatory)
+                               .set("image","image you want for your vm")                    #Contains the image of the machine (Mandatory)
+                               .set("size","size that you wish to select for this Droplet")  #Contains the size of the machine (Mandatory)
+                               .set("token","${2:your token generated from account}")            #Your digitalocean account token (Optional)
                                .sync
 
 
