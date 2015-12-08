@@ -40,9 +40,7 @@ if ${4:response_exitcode} == 0
 
    @log.info('Machine Started :: '+response_power.to_s+' | State of the machine ::'+response_state)
 
-   @output.set("power-on",response_power)
-
-   @output.set("state",response_state)
+   @output.setraw("response",${1:connector_name}_response.to_s)
 
 else
 
@@ -82,10 +80,7 @@ if ${4:response_exitcode} == 0
 
    @log.info('Machine Stop :: '+response_power.to_s+' | State of the machine ::'+response_state)
 
-   @output.set("power-off",response_power)
-
-   @output.set("state",response_state)
-
+   @output.setraw("response",${1:connector_name}_response.to_s)
 else
 
    @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
@@ -122,7 +117,7 @@ if ${4:response_exitcode} == 0
 
  @log.info('Machine List :: '+instance_list.to_s)
 
- @output.set("list",instance_list)
+ @output.setraw("response",${1:connector_name}_response.to_s)
 
 else
 
@@ -161,7 +156,7 @@ if ${4:response_exitcode} == 0
 
  @log.info('Machine rebooted :: '+instance_reboot.to_s)
 
- @output.set("rebooted",instance_reboot)
+ @output.setraw("response",${1:connector_name}_response.to_s)
 
 else
 
@@ -200,8 +195,7 @@ if ${4:response_exitcode} == 0
 
  @log.info('Machine reset :: '+instance_reset.to_s+'Machine state ::'+instance_state.to_s)
 
- @output.set("instance-reset",instance_reset.to_s)
- @output.set("instance-state",instance_state.to_s)
+  @output.setraw("response",${1:connector_name}_response.to_s)
 else
 
  @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
@@ -239,7 +233,7 @@ if ${4:response_exitcode} == 0
 
  @log.info('Machine details :: '+instance_details.to_s)
 
- @output.setraw("instance-details",connector_name_response.to_s)
+  @output.setraw("response",${1:connector_name}_response.to_s)
 else
 
  @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
@@ -280,7 +274,7 @@ if ${7:response_exitcode} == 0
 
  @log.info('Machine details :: '+instance_details.to_s)
 
- @output.setraw("instance-details",connector_name_response.to_s)
+  @output.setraw("response",${1:connector_name}_response.to_s)
 else
 
  @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
@@ -318,7 +312,7 @@ if ${4:response_exitcode} == 0
 
  @log.info('Machine deleted :: '+instance_deleted.to_s)
 
- @output.set("instance-deleted",instance_deleted.to_s)
+  @output.setraw("response",${1:connector_name}_response.to_s)
 else
 
  @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
@@ -360,8 +354,8 @@ if ${8:response_exitcode} == 0
  @log.info('SUCCESS in executing Softlayer Connector where, exitcode ::'+response_exitcode.to_s+'| message ::'+response_message)
 
  @log.info('Machine id :: '+instance_id.to_s+'Machine domain name :: '+instance_domainName.to_s)
- @output.set("instance-domainName",instance_domainName.to_s)
- @output.set("instance-id",instance_id.to_s)
+ @output.setraw("response",${1:connector_name}_response.to_s)
+
 else
 
  @log.error('ERROR in executing Softlayer connector where, exitcode :: '+response_exitcode.to_s+' | message :: '+response_message)
