@@ -4,7 +4,7 @@
     "name": "adpande"
   },
   "main": "./lib/main",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Atom editor package and Snippets for Flint IT Automation Platform",
   "repository": {
     "type": "git",
